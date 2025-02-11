@@ -1,0 +1,40 @@
+Date : 2025-02-11 07:29:11
+Directory : /home/antkky/projects/revised_go_scraper
+Total : 11 files,  485 codes, 9 comments, 80 blanks, all 574 lines
+
+Languages
++----------+------------+------------+------------+------------+------------+
+| language | files      | code       | comment    | blank      | total      |
++----------+------------+------------+------------+------------+------------+
+| Go       |         10 |        347 |          9 |         79 |        435 |
+| JSON     |          1 |        138 |          0 |          1 |        139 |
++----------+------------+------------+------------+------------+------------+
+
+Directories
++------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                             | files      | code       | comment    | blank      | total      |
++------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                |         11 |        485 |          9 |         80 |        574 |
+| . (Files)                                                        |          2 |        138 |          9 |         21 |        168 |
+| binance                                                          |          4 |         92 |          0 |         27 |        119 |
+| coinex                                                           |          4 |        117 |          0 |         31 |        148 |
+| config                                                           |          1 |        138 |          0 |          1 |        139 |
++------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| filename                                                         | language | code       | comment    | blank      | total      |
++------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| /home/antkky/projects/revised_go_scraper/binance/binance.go      | Go       |          4 |          0 |          3 |          7 |
+| /home/antkky/projects/revised_go_scraper/binance/binance_test.go | Go       |          1 |          0 |          1 |          2 |
+| /home/antkky/projects/revised_go_scraper/binance/save.go         | Go       |         86 |          0 |         22 |        108 |
+| /home/antkky/projects/revised_go_scraper/binance/structs.go      | Go       |          1 |          0 |          1 |          2 |
+| /home/antkky/projects/revised_go_scraper/coinex/coinex.go        | Go       |         29 |          0 |          7 |         36 |
+| /home/antkky/projects/revised_go_scraper/coinex/coinex_test.go   | Go       |          1 |          0 |          1 |          2 |
+| /home/antkky/projects/revised_go_scraper/coinex/save.go          | Go       |         86 |          0 |         22 |        108 |
+| /home/antkky/projects/revised_go_scraper/coinex/structs.go       | Go       |          1 |          0 |          1 |          2 |
+| /home/antkky/projects/revised_go_scraper/config/streams.json     | JSON     |        138 |          0 |          1 |        139 |
+| /home/antkky/projects/revised_go_scraper/main.go                 | Go       |        112 |          9 |         16 |        137 |
+| /home/antkky/projects/revised_go_scraper/structs.go              | Go       |         26 |          0 |          5 |         31 |
+| Total                                                            |          |        485 |          9 |         80 |        574 |
++------------------------------------------------------------------+----------+------------+------------+------------+------------+

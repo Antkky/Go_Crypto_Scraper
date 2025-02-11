@@ -66,7 +66,7 @@ func routeSubscribe(exchange ExchangeConfig, conn *websocket.Conn) error {
 	return nil
 }
 
-func routeResponse(conn *websocket.Conn, exchange ExchangeConfig) error {
+func routeResponse(exchange ExchangeConfig, conn *websocket.Conn) error {
 	defer func() {
 		if conn != nil {
 			_ = conn.Close()
@@ -90,19 +90,22 @@ func routeResponse(conn *websocket.Conn, exchange ExchangeConfig) error {
 
 func main() {
 	// Open & Parse Config File
-	raw_config, err := os.ReadFile("config/streams.json")
+	rawConfig, err := os.ReadFile("config/streams.json")
 	if err != nil {
 		log.Fatalf("Error reading JSON file: %s\n", err)
+		return
+	}
+	if len(rawConfig) <= 0 {
+		log.Fatalln("JSON file is empty")
+		return
 	}
 	var config WebSocketConfig
-	if err := json.Unmarshal(raw_config, &config); err != nil {
+	if err = json.Unmarshal(rawConfig, &config); err != nil {
 		log.Fatalf("Error parsing JSON: %s\n", err)
 	}
 
-	// Array to hold the connections
-	connections := make([]*websocket.Conn, len(config))
-
 	// Connect & Subscribe to Exchanges
+	connections := make([]*websocket.Conn, len(config))
 	for i, exchange := range config {
 		conn, err1 := connectExchange(exchange)
 		if err1 != nil {
@@ -124,10 +127,10 @@ func main() {
 	// Check for responses
 	for i, connection := range connections {
 		exchange := config[i]
-		go routeResponse(connection, exchange)
+		go routeResponse(exchange, connection)
 		println("Listening on: ", exchange.Name)
 	}
 
 	go gracefulShutdown(connections)
-	select {}
+	select {} // fix continuose running
 }
