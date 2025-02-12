@@ -5,18 +5,10 @@ import (
 	"log"
 	"os"
 	"os/signal"
-	"strings"
 	"syscall"
-
-	"github.com/Antkky/go_crypto_scraper/binance"
-	"github.com/Antkky/go_crypto_scraper/bitfinex"
-	"github.com/Antkky/go_crypto_scraper/bybit"
-	"github.com/Antkky/go_crypto_scraper/coinex"
 
 	"github.com/gorilla/websocket"
 )
-
-type WebSocketConfig []ExchangeConfig
 
 func gracefulShutdown(connections []*websocket.Conn) {
 	// Create a channel to listen for shutdown signals
@@ -68,76 +60,48 @@ func routeSubscribe(exchange ExchangeConfig, conn *websocket.Conn) error {
 	return nil
 }
 
-func routeResponse(exchange ExchangeConfig, conn *websocket.Conn) error {
-	defer func() {
-		if conn != nil {
-			_ = conn.Close()
-		}
-	}()
-	for {
-		_, message, err := conn.ReadMessage()
-		if err != nil {
-			log.Printf("Error reading message from %s: %s\n", exchange.Name, err)
-			return err
-		}
-		switch {
-		case strings.HasPrefix(exchange.Name, "Binance"):
-			binance.HandleMessage(message)
-		case strings.HasPrefix(exchange.Name, "Coinex"):
-			coinex.HandleMessage(message)
-		case strings.HasPrefix(exchange.Name, "ByBit"):
-			bybit.HandleMessage(message)
-		case strings.HasPrefix(exchange.Name, "BitFinex"):
-			bitfinex.HandleMessage(message)
-		default:
-			log.Println("Unhandled Exchange Response Type")
-		}
-	}
-}
-
-func main() {
-	// Open & Parse Config File
+func revised_main() {
+	/******** Open & Parse Config File *********/
+	// open
 	rawConfig, err := os.ReadFile("config/streams.json")
 	if err != nil {
 		log.Fatalf("Error reading JSON file: %s\n", err)
 		return
 	}
-	if len(rawConfig) <= 0 {
-		log.Fatalln("JSON file is empty")
+	// declare
+	var configs []ExchangeConfig
+	// parse
+	if err = json.Unmarshal(rawConfig, &configs); err != nil {
+		log.Fatalf("Error parsing JSON: %s\n", err)
 		return
 	}
-	var config WebSocketConfig
-	if err = json.Unmarshal(rawConfig, &config); err != nil {
-		log.Fatalf("Error parsing JSON: %s\n", err)
-	}
-
-	// Connect & Subscribe to Exchanges
-	connections := make([]*websocket.Conn, len(config))
-	for i, exchange := range config {
-		conn, err1 := connectExchange(exchange)
-		if err1 != nil {
-			log.Printf("Error connecting to exchange: %s\nError: %s\n", exchange.Name, err1)
+	/********** Establish Connections **********/
+	connections := make([]*websocket.Conn, len(configs))
+	for i, config := range configs {
+		// Connect
+		// refactor the function?
+		conn, err := connectExchange(config)
+		if err != nil {
+			log.Printf("Error connecting to exchange: %s\nError: %s\n", config.Name, err)
 			continue
 		}
 		if conn != nil {
 			connections[i] = conn
-			log.Println("Connected to: ", exchange.Name)
+		} else {
+			log.Printf("Error, connection for exchange: %s is nil.", config.Name)
 		}
-		if err2 := routeSubscribe(exchange, conn); err2 != nil {
-			log.Printf("Error subscribing to exchange: %s\nError: %s\n", exchange.Name, err2)
+		// Subscribe
+		// refactor the function?
+		if err2 := routeSubscribe(config, conn); err2 != nil {
+			log.Printf("Error subscribing to exchange: %s\nError: %s\n", config.Name, err2)
 		}
-		log.Println("Subscribed to: ", exchange.Name)
-
-		// Remember to add a ping task to these connections (exchange.ping)
+		// Ping
+		// function not implemented yet
+		log.Printf("Connection Established for: %s", config.Name)
 	}
+	/******** Launch Connection Handlers *******/
 
-	// Check for responses
-	for i, connection := range connections {
-		exchange := config[i]
-		go routeResponse(exchange, connection)
-		println("Listening on: ", exchange.Name)
-	}
-
+	/*********** Graceful Shutdown ************/
 	go gracefulShutdown(connections)
-	select {} // fix continuose running
+	select {} // fix this
 }

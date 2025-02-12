@@ -14,7 +14,7 @@ this function is the first function that runs and is responsible for calling oth
 
 ### Main Operation
 1. Read & Parse JSON Config File
-	![[OpenParseJSON.png]]
+	![[obsidian_images/OpenParseJSON.png]]
 2. Establish Multiple Websocket Connections
 	[[#connectExchange()]]
 	[[#routeSubscribe()]]

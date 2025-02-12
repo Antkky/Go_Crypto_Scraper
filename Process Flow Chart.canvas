@@ -16,10 +16,10 @@
 		{"id":"f68e4752c6f57085","type":"text","text":"Remember to add pinging task","x":960,"y":-120,"width":250,"height":60},
 		{"id":"a51f6f4471bd9232","type":"text","text":"These are custom to the exchange","x":1085,"y":300,"width":250,"height":60},
 		{"id":"cb850f640b023de8","type":"text","text":"Make sure you somehow close the goroutines that are collecting data for those exchanges","x":2460,"y":-180,"width":250,"height":120},
-		{"id":"3ff8f1ced1d4d274","type":"text","text":"Make sure you somehow close the goroutines that are collecting data for those exchanges","x":3060,"y":300,"width":250,"height":130}
+		{"id":"3ff8f1ced1d4d274","type":"text","text":"Make sure you somehow close the goroutines that are collecting data for those exchanges","x":3060,"y":300,"width":250,"height":130},
+		{"id":"1ede56536068d305","type":"file","file":"obsidian_images/OpenParseJSON 1.png","x":285,"y":960,"width":400,"height":355}
 	],
 	"edges":[
-		{"id":"079969b002afd8db","fromNode":"0d76325eaf56bd20","fromSide":"right","toNode":"b4e7cb8e4e0453bc","toSide":"left"},
 		{"id":"b00107de0380167f","fromNode":"b4e7cb8e4e0453bc","fromSide":"right","toNode":"0669796c3d7c50cd","toSide":"left"},
 		{"id":"a5accff1765b0df0","fromNode":"7bbcba42399b1065","fromSide":"right","toNode":"0f8ad5c905ef5b29","toSide":"left"},
 		{"id":"f49806631bfad245","fromNode":"0f8ad5c905ef5b29","fromSide":"right","toNode":"f8934476b12f6a04","toSide":"left"},
@@ -35,6 +35,7 @@
 		{"id":"15da68f0fbc566c7","fromNode":"cb850f640b023de8","fromSide":"bottom","toNode":"7083bb7e488420e6","toSide":"top"},
 		{"id":"b41af56e12eea3fe","fromNode":"3ff8f1ced1d4d274","fromSide":"top","toNode":"0ec3c7ce58f875dd","toSide":"bottom"},
 		{"id":"1e7ae7b8d894f3f3","fromNode":"a51f6f4471bd9232","fromSide":"top","toNode":"0669796c3d7c50cd","toSide":"bottom"},
-		{"id":"f568655654e6d4e7","fromNode":"f68e4752c6f57085","fromSide":"bottom","toNode":"0669796c3d7c50cd","toSide":"top"}
+		{"id":"f568655654e6d4e7","fromNode":"f68e4752c6f57085","fromSide":"bottom","toNode":"0669796c3d7c50cd","toSide":"top"},
+		{"id":"079969b002afd8db","fromNode":"0d76325eaf56bd20","fromSide":"right","toNode":"b4e7cb8e4e0453bc","toSide":"left"}
 	]
 }

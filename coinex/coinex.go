@@ -33,10 +33,10 @@ func decompressGzip(data []byte) ([]byte, error) {
 func HandleMessage(message []byte) error {
 	if isGzipped(message) {
 		// message is gzipped
-		decompressedMessage, err := decompressGzip(message)
-		if err != nil {
-			return err
-		}
+		//decompressedMessage, err := decompressGzip(message)
+		//if err != nil {
+		//return err
+		//}
 	} else {
 		// message isnt gzipped
 	}
