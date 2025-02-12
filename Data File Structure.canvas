@@ -1,0 +1,21 @@
+{
+	"nodes":[
+		{"id":"7419f57e7a962f73","type":"text","text":"Binance","x":-157,"y":-548,"width":250,"height":60,"color":"2"},
+		{"id":"26f47548d2233a00","type":"text","text":"BTCUSDT","x":-93,"y":-468,"width":250,"height":60,"color":"2"},
+		{"id":"5f04de3db83b3ff3","type":"text","text":"Trades.CSV","x":-32,"y":-388,"width":250,"height":60,"color":"4"},
+		{"id":"942da2150a7d2676","type":"text","text":"Ticker.CSV","x":-32,"y":-308,"width":250,"height":60,"color":"4"},
+		{"id":"5d440e7f94683bac","type":"text","text":"ETHUSDT","x":-93,"y":-228,"width":250,"height":60,"color":"2"},
+		{"id":"03d1c346847d7e28","type":"text","text":"Trades.CSV","x":-32,"y":-148,"width":250,"height":60,"color":"4"},
+		{"id":"08ace0ccf33aceac","type":"text","text":"Ticker.CSV","x":-32,"y":-68,"width":250,"height":60,"color":"4"},
+		{"id":"7c797491ec84279b","type":"text","text":"Coinex_Spot","x":-157,"y":12,"width":250,"height":60,"color":"2"},
+		{"id":"c3a56bc0b70d17f0","type":"text","text":"BTCUSDT","x":-93,"y":92,"width":250,"height":60,"color":"2"},
+		{"id":"4ed4c3042b36aa18","type":"text","text":"Trades.CSV","x":-32,"y":172,"width":250,"height":60,"color":"4"},
+		{"id":"581f881b296dc579","type":"text","text":"Ticker.CSV","x":-32,"y":252,"width":250,"height":60,"color":"4"},
+		{"id":"25274e2c286c1103","type":"text","text":"ETHUSDT","x":-93,"y":332,"width":250,"height":60,"color":"2"},
+		{"id":"f036ab8094e4f2b1","type":"text","text":"Ticker.CSV","x":-32,"y":492,"width":250,"height":60,"color":"4"},
+		{"id":"537607a4fbcdbc1c","type":"text","text":"Trades.CSV","x":-32,"y":412,"width":250,"height":60,"color":"4"},
+		{"id":"3d668e7fbc2c0049","type":"text","text":"Etc...","x":-157,"y":572,"width":250,"height":60,"color":"2"},
+		{"id":"94adcffe26a244f1","type":"text","text":"Data","x":-218,"y":-632,"width":250,"height":60,"color":"3"}
+	],
+	"edges":[]
+}
