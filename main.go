@@ -5,12 +5,18 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 
+	"github.com/Antkky/go_crypto_scraper/binance"
+	"github.com/Antkky/go_crypto_scraper/bitfinex"
+	"github.com/Antkky/go_crypto_scraper/bybit"
+	"github.com/Antkky/go_crypto_scraper/coinex"
+	"github.com/Antkky/go_crypto_scraper/structs"
 	"github.com/gorilla/websocket"
 )
 
-func gracefulShutdown(connections []*websocket.Conn) {
+func GracefulShutdown(connections []*websocket.Conn) {
 	// Create a channel to listen for shutdown signals
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
@@ -31,7 +37,7 @@ func gracefulShutdown(connections []*websocket.Conn) {
 	log.Println("All connections closed.")
 }
 
-func connectExchange(exchange ExchangeConfig) (*websocket.Conn, error) {
+func ConnectExchange(exchange structs.ExchangeConfig) (*websocket.Conn, error) {
 	conn, _, err := websocket.DefaultDialer.Dial(exchange.URI, nil)
 	if err != nil {
 		return nil, err
@@ -39,7 +45,7 @@ func connectExchange(exchange ExchangeConfig) (*websocket.Conn, error) {
 	return conn, nil
 }
 
-func routeSubscribe(exchange ExchangeConfig, conn *websocket.Conn) error {
+func RouteSubscribe(exchange structs.ExchangeConfig, conn *websocket.Conn) error {
 	// Loop Through Streams
 	var streams []map[string]interface{}
 	if err := json.Unmarshal(exchange.Streams, &streams); err != nil {
@@ -60,48 +66,69 @@ func routeSubscribe(exchange ExchangeConfig, conn *websocket.Conn) error {
 	return nil
 }
 
-func revised_main() {
+func main() {
 	/******** Open & Parse Config File *********/
-	// open
 	rawConfig, err := os.ReadFile("config/streams.json")
 	if err != nil {
 		log.Fatalf("Error reading JSON file: %s\n", err)
-		return
 	}
-	// declare
-	var configs []ExchangeConfig
-	// parse
+
+	var configs []structs.ExchangeConfig
 	if err = json.Unmarshal(rawConfig, &configs); err != nil {
 		log.Fatalf("Error parsing JSON: %s\n", err)
-		return
 	}
+
 	/********** Establish Connections **********/
-	connections := make([]*websocket.Conn, len(configs))
-	for i, config := range configs {
-		// Connect
-		// refactor the function?
-		conn, err := connectExchange(config)
+	connections := make([]*websocket.Conn, 0) // Use slice instead of fixed-size array
+	for _, config := range configs {
+		conn, err := ConnectExchange(config)
 		if err != nil {
-			log.Printf("Error connecting to exchange: %s\nError: %s\n", config.Name, err)
+			log.Printf("❌ Error connecting to exchange %s: %s\n", config.Name, err)
 			continue
 		}
-		if conn != nil {
-			connections[i] = conn
-		} else {
-			log.Printf("Error, connection for exchange: %s is nil.", config.Name)
+		if conn == nil {
+			log.Printf("⚠️ Connection for exchange %s is nil.\n", config.Name)
+			continue
 		}
-		// Subscribe
-		// refactor the function?
-		if err2 := routeSubscribe(config, conn); err2 != nil {
-			log.Printf("Error subscribing to exchange: %s\nError: %s\n", config.Name, err2)
+		// Subscribe to streams
+		if err := RouteSubscribe(config, conn); err != nil {
+			log.Printf("⚠️ Error subscribing to exchange %s: %s\n", config.Name, err)
+			conn.Close() // Close connection if subscription fails
+			continue
 		}
-		// Ping
-		// function not implemented yet
-		log.Printf("Connection Established for: %s", config.Name)
+
+		log.Printf("✅ Connection Established for: %s", config.Name)
+		connections = append(connections, conn)
+
+		// Launch Connection Handler
+		switch {
+		case strings.Contains(config.Name, "Binance"):
+			go binance.HandleConnection(conn, config)
+		case strings.Contains(config.Name, "Coinex"):
+			go coinex.HandleConnection(conn, config)
+		case strings.Contains(config.Name, "Bybit"):
+			go bybit.HandleConnection(conn, config)
+		case strings.Contains(config.Name, "Bitfinex"):
+			go bitfinex.HandleConnection(conn, config)
+		default:
+			log.Println("⚠️ Unhandled Exchange:", config.Name)
+		}
 	}
-	/******** Launch Connection Handlers *******/
 
 	/*********** Graceful Shutdown ************/
-	go gracefulShutdown(connections)
-	select {} // fix this
+	signalChan := make(chan os.Signal, 1)
+	signal.Notify(signalChan, os.Interrupt, syscall.SIGTERM)
+
+	<-signalChan // Wait for termination signal
+	log.Println("⏳ Shutting down...")
+
+	// Close all WebSocket connections
+	for _, conn := range connections {
+		if conn != nil {
+			conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, "Shutdown"))
+			conn.Close()
+		}
+	}
+
+	log.Println("✅ Cleanup complete. Exiting.")
 }

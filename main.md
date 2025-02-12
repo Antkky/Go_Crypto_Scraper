@@ -18,7 +18,7 @@ this function is the first function that runs and is responsible for calling oth
 2. Establish Multiple Websocket Connections
 	[[#connectExchange()]]
 	[[#routeSubscribe()]]
-	![[establishConnections.png]]
+	![[obsidian_images/establishConnections.png]]
 3. Receive & Save Responses Asynchronously
 	[[#routeResponse()]]
 	![[listenAsynchronously.png]]

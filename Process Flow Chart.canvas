@@ -1,6 +1,5 @@
 {
 	"nodes":[
-		{"id":"17683d5ba1ed8a1b","type":"text","text":"Asynchronously handle and process byte array message & package into a standardized format for saving. ","x":1260,"y":40,"width":250,"height":160,"color":"1"},
 		{"id":"7bbcba42399b1065","type":"text","text":"Add standardized Data to buffer correlating to the exchange, asset, and stream.","x":1560,"y":60,"width":250,"height":120,"color":"1"},
 		{"id":"0f8ad5c905ef5b29","type":"text","text":"Flush the data buffer depending on the sizes or time elapsed since last flush","x":1860,"y":60,"width":250,"height":120,"color":"2"},
 		{"id":"f8934476b12f6a04","type":"text","text":"Write rows to CSV file","x":2160,"y":90,"width":250,"height":60,"color":"4"},
@@ -14,19 +13,21 @@
 		{"id":"b14f20945483a542","type":"text","text":"Repeat","x":3360,"y":89,"width":250,"height":63,"color":"1"},
 		{"id":"0d76325eaf56bd20","type":"text","text":"Read & Parse JSON Config File","x":360,"y":80,"width":250,"height":80,"color":"4"},
 		{"id":"f68e4752c6f57085","type":"text","text":"Remember to add pinging task","x":960,"y":-120,"width":250,"height":60},
-		{"id":"a51f6f4471bd9232","type":"text","text":"These are custom to the exchange","x":1085,"y":300,"width":250,"height":60},
 		{"id":"cb850f640b023de8","type":"text","text":"Make sure you somehow close the goroutines that are collecting data for those exchanges","x":2460,"y":-180,"width":250,"height":120},
 		{"id":"3ff8f1ced1d4d274","type":"text","text":"Make sure you somehow close the goroutines that are collecting data for those exchanges","x":3060,"y":300,"width":250,"height":130},
-		{"id":"1ede56536068d305","type":"file","file":"obsidian_images/OpenParseJSON 1.png","x":285,"y":960,"width":400,"height":355}
+		{"id":"1ede56536068d305","type":"file","file":"obsidian_images/OpenParseJSON 1.png","x":285,"y":960,"width":400,"height":355},
+		{"id":"09ecb40759ee0c07","type":"file","file":"obsidian_images/EstablishConnections 1.png","x":785,"y":938,"width":333,"height":400},
+		{"id":"97bfb0d7e24692b9","x":1260,"y":0,"width":250,"height":240,"type":"file","file":"Handle Connection.md"},
+		{"id":"a51f6f4471bd9232","type":"text","text":"These are custom to the exchange","x":1085,"y":320,"width":250,"height":60}
 	],
 	"edges":[
 		{"id":"b00107de0380167f","fromNode":"b4e7cb8e4e0453bc","fromSide":"right","toNode":"0669796c3d7c50cd","toSide":"left"},
 		{"id":"a5accff1765b0df0","fromNode":"7bbcba42399b1065","fromSide":"right","toNode":"0f8ad5c905ef5b29","toSide":"left"},
 		{"id":"f49806631bfad245","fromNode":"0f8ad5c905ef5b29","fromSide":"right","toNode":"f8934476b12f6a04","toSide":"left"},
-		{"id":"0e949260f41f3965","fromNode":"17683d5ba1ed8a1b","fromSide":"right","toNode":"7bbcba42399b1065","toSide":"left"},
-		{"id":"338d6c623e586eb2","fromNode":"0669796c3d7c50cd","fromSide":"right","toNode":"17683d5ba1ed8a1b","toSide":"left"},
+		{"id":"0e949260f41f3965","fromNode":"97bfb0d7e24692b9","fromSide":"right","toNode":"7bbcba42399b1065","toSide":"left"},
+		{"id":"338d6c623e586eb2","fromNode":"0669796c3d7c50cd","fromSide":"right","toNode":"97bfb0d7e24692b9","toSide":"left"},
 		{"id":"d4932df26cd77770","fromNode":"bd9a8b0f27e1adcc","fromSide":"bottom","toNode":"7bbcba42399b1065","toSide":"top"},
-		{"id":"df0fbc8f8d53227a","fromNode":"a51f6f4471bd9232","fromSide":"top","toNode":"17683d5ba1ed8a1b","toSide":"bottom"},
+		{"id":"df0fbc8f8d53227a","fromNode":"a51f6f4471bd9232","fromSide":"top","toNode":"97bfb0d7e24692b9","toSide":"bottom"},
 		{"id":"e791b245cb7846b1","fromNode":"af0c0beac35262a8","fromSide":"top","toNode":"0f8ad5c905ef5b29","toSide":"bottom"},
 		{"id":"405ff4a9c0376eb6","fromNode":"f8934476b12f6a04","fromSide":"right","toNode":"7083bb7e488420e6","toSide":"left"},
 		{"id":"9f9d8196546bdbc8","fromNode":"7083bb7e488420e6","fromSide":"right","toNode":"336dd11f338fc913","toSide":"left"},
@@ -36,6 +37,7 @@
 		{"id":"b41af56e12eea3fe","fromNode":"3ff8f1ced1d4d274","fromSide":"top","toNode":"0ec3c7ce58f875dd","toSide":"bottom"},
 		{"id":"1e7ae7b8d894f3f3","fromNode":"a51f6f4471bd9232","fromSide":"top","toNode":"0669796c3d7c50cd","toSide":"bottom"},
 		{"id":"f568655654e6d4e7","fromNode":"f68e4752c6f57085","fromSide":"bottom","toNode":"0669796c3d7c50cd","toSide":"top"},
-		{"id":"079969b002afd8db","fromNode":"0d76325eaf56bd20","fromSide":"right","toNode":"b4e7cb8e4e0453bc","toSide":"left"}
+		{"id":"079969b002afd8db","fromNode":"0d76325eaf56bd20","fromSide":"right","toNode":"b4e7cb8e4e0453bc","toSide":"left"},
+		{"id":"4b2ab20f6c8aab4f","fromNode":"1ede56536068d305","fromSide":"right","toNode":"09ecb40759ee0c07","toSide":"left"}
 	]
 }

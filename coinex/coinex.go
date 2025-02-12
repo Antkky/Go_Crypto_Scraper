@@ -6,6 +6,9 @@ import (
 	"errors"
 	"fmt"
 	"io"
+
+	"github.com/Antkky/go_crypto_scraper/structs"
+	"github.com/gorilla/websocket"
 )
 
 func isGzipped(message []byte) bool {
@@ -30,16 +33,11 @@ func decompressGzip(data []byte) ([]byte, error) {
 	return decompressedData.Bytes(), nil
 }
 
+func HandleConnection(conn *websocket.Conn, exchange structs.ExchangeConfig) {
+
+}
+
 func HandleMessage(message []byte) error {
-	if isGzipped(message) {
-		// message is gzipped
-		//decompressedMessage, err := decompressGzip(message)
-		//if err != nil {
-		//return err
-		//}
-	} else {
-		// message isnt gzipped
-	}
 
 	return nil
 }

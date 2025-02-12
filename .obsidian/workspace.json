@@ -4,24 +4,21 @@
     "type": "split",
     "children": [
       {
-        "id": "0906aebdebc1e8a5",
+        "id": "daa6671f81f39043",
         "type": "tabs",
         "children": [
           {
-            "id": "fe4ee16babf995f7",
+            "id": "833c178f9009d9f8",
             "type": "leaf",
             "state": {
-              "type": "canvas",
+              "type": "markdown",
               "state": {
-                "file": "Process Flow Chart.canvas",
-                "viewState": {
-                  "x": 824.3513730357365,
-                  "y": 243.9244225087774,
-                  "zoom": -0.2506433832422678
-                }
+                "file": "Handle Connection.md",
+                "mode": "source",
+                "source": false
               },
-              "icon": "lucide-layout-dashboard",
-              "title": "Process Flow Chart"
+              "icon": "lucide-file",
+              "title": "Handle Connection"
             }
           }
         ]
@@ -171,14 +168,19 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "fe4ee16babf995f7",
+  "active": "833c178f9009d9f8",
   "lastOpenFiles": [
-    "obsidian_images/OpenParseJSON 1.png",
     "Process Flow Chart.canvas",
+    "Handle Connection.md",
+    "structs/structs.go",
+    "structs",
+    "main.md",
+    "Unit Tests.md",
+    "obsidian_images/EstablishConnections 1.png",
+    "obsidian_images/OpenParseJSON 1.png",
     "main_revised.go",
     "revised_main.go",
     "Data File Structure.canvas",
-    "main.md",
     "Structs.md",
     "Go Crypto Scraper.md",
     "2025-02-12.md",
@@ -190,8 +192,6 @@
     "bitfinex/bitfinex_test.go",
     "bitfinex/structs.go",
     "bitfinex/save.go",
-    "bitfinex/bitfinex.go",
-    "bybit/bybit.go",
     "obsidian_images/closeConnections.png",
     "obsidian_images/shutdownChannel.png",
     "obsidian_images/LuhDefer.png",
@@ -204,7 +204,6 @@
     "obsidian_images/LoopStreams.png",
     "obsidian_images/ParseStreams.png",
     "obsidian_images/makeConnection.png",
-    "obsidian_images/listenGracefulShutdown.png",
     "ExchangeConfig.md",
     "bitfinex/tests.md",
     "bitfinex/bitfinex handler.md",
@@ -217,8 +216,6 @@
     "binance/tests.md",
     "coinex/tests.md",
     "binance/structs.md",
-    "binance/demo_server.md",
-    "routeResponse().md",
-    "main().md"
+    "binance/demo_server.md"
   ]
 }
