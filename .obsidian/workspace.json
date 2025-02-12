@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "main.md",
+                "file": "coinex/coinex.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "main"
+              "title": "coinex"
             }
           }
         ]
@@ -170,15 +170,24 @@
   },
   "active": "23dcbaba24d9960e",
   "lastOpenFiles": [
+    "coinex/save.md",
+    "coinex/coinex.md",
+    "main.md",
+    "bybit/save.go",
+    "bybit/bybit_test.go",
+    "bybit/structs.go",
+    "bitfinex/bitfinex_test.go",
+    "bitfinex/structs.go",
+    "bitfinex/save.go",
+    "bitfinex/bitfinex.go",
+    "bybit/bybit.go",
     "obsidian_images/closeConnections.png",
     "obsidian_images/shutdownChannel.png",
     "obsidian_images/LuhDefer.png",
     "obsidian_images/ShutdownChannel.png",
-    "main.md",
     "binance/save.md",
     "bitfinex/save.md",
     "bybit/save.md",
-    "coinex/save.md",
     "Structs.md",
     "binance/binance_handler.md",
     "obsidian_images/loopIncoming.png",
@@ -188,7 +197,6 @@
     "obsidian_images/makeConnection.png",
     "obsidian_images/listenGracefulShutdown.png",
     "obsidian_images/listenAsynchronously.png",
-    "obsidian_images/establishConnections.png",
     "obsidian_images",
     "ExchangeConfig.md",
     "bitfinex/tests.md",
@@ -200,9 +208,7 @@
     "bybit/structs.md",
     "bybit/tests.md",
     "binance/tests.md",
-    "coinex/coinex_handler.md",
     "bitfinex",
-    "bybit",
     "coinex/tests.md",
     "binance/structs.md",
     "binance/demo_server.md",

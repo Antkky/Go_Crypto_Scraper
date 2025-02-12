@@ -17,8 +17,8 @@ type dataStore struct {
 }
 
 var (
-	coinexTickerData = &dataStore{data: make(map[string][][]string)}
-	coinexTradeData = &dataStore{data: make(map[string][][]string)}
+	coinexTickerData    = &dataStore{data: make(map[string][][]string)}
+	coinexTradeData     = &dataStore{data: make(map[string][][]string)}
 	coinexLastFlushTime sync.Map
 )
 
@@ -27,7 +27,7 @@ func updateStoredRows(symbol string, store *dataStore, rows ...[]string) {
 	defer store.Unlock()
 
 	if store.data[symbol] == nil {
-			store.data[symbol] = make([][]string, 0)
+		store.data[symbol] = make([][]string, 0)
 	}
 	store.data[symbol] = append(store.data[symbol], rows...)
 }
@@ -49,12 +49,12 @@ func flushRowsToCSV(symbol string, exchange string, filename string, store *data
 	}
 
 	lastFlushTimeVal, _ := coinexLastFlushTime.LoadOrStore(symbol, time.Time{})
-  lastFlushTime, _ := lastFlushTimeVal.(time.Time)
+	lastFlushTime, _ := lastFlushTimeVal.(time.Time)
 
 	if rowCount >= int(batchSize) || time.Since(lastFlushTime) > 5*time.Second {
 		if err := writeRowsToCSV(filePath, rows, filetype); err != nil {
-				log.Println("Error writing CSV:", err)
-				return err
+			log.Println("Error writing CSV:", err)
+			return err
 		}
 
 		store.Lock()
@@ -80,9 +80,9 @@ func writeRowsToCSV(filePath string, rows [][]string, fileType string) error {
 
 	var header []string
 	if fileType == "Ticker" {
-		header = []string{"TimeStamp", "Date"}//Header here
+		header = []string{"TimeStamp", "Date"} //Header here
 	} else if fileType == "Trades" {
-		header = []string{"TimeStamp", "Date"}//Header here
+		header = []string{"TimeStamp", "Date"} //Header here
 	}
 
 	fileStats, err := file.Stat()

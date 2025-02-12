@@ -104,7 +104,7 @@ This function is responsible for routing incoming responses to the correlating a
 19. Set Luh Defer
 	![[LuhDefer.png]]
 20. Loop Through Incoming Messages
-	[[coinex_handler]]
+	[[coinex]]
 	[[binance_handler]]
 	[[bybit_handler]]
 	[[bitfinex handler]]

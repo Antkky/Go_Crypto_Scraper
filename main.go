@@ -9,6 +9,8 @@ import (
 	"syscall"
 
 	"github.com/Antkky/go_crypto_scraper/binance"
+	"github.com/Antkky/go_crypto_scraper/bitfinex"
+	"github.com/Antkky/go_crypto_scraper/bybit"
 	"github.com/Antkky/go_crypto_scraper/coinex"
 
 	"github.com/gorilla/websocket"
@@ -78,11 +80,16 @@ func routeResponse(exchange ExchangeConfig, conn *websocket.Conn) error {
 			log.Printf("Error reading message from %s: %s\n", exchange.Name, err)
 			return err
 		}
-		if strings.HasPrefix(exchange.Name, "Binance") {
+		switch {
+		case strings.HasPrefix(exchange.Name, "Binance"):
 			binance.HandleMessage(message)
-		} else if strings.HasPrefix(exchange.Name, "Coinex") {
+		case strings.HasPrefix(exchange.Name, "Coinex"):
 			coinex.HandleMessage(message)
-		} else {
+		case strings.HasPrefix(exchange.Name, "ByBit"):
+			bybit.HandleMessage(message)
+		case strings.HasPrefix(exchange.Name, "BitFinex"):
+			bitfinex.HandleMessage(message)
+		default:
 			log.Println("Unhandled Exchange Response Type")
 		}
 	}

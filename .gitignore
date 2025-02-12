@@ -25,6 +25,7 @@ go.work.sum
 data/*
 
 .vscode
+.VSCodeCounter
 
 # env file
 .env
