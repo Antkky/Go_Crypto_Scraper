@@ -5,19 +5,13 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"time"
 
 	"github.com/Antkky/go_crypto_scraper/structs"
 	"github.com/gorilla/websocket"
 )
 
-/*
-Binance Global and Binance US has different response formats
-
-Subscribe to streams
-Make Ping Goroutines
-Start Receiving Messages
-HandleMessages()
-*/
+// gets executed as a goroutine
 func HandleConnection(conn *websocket.Conn, exchange structs.ExchangeConfig) {
 	if conn == nil {
 		log.Println("Handle connection executed with no connection")
@@ -46,35 +40,141 @@ func HandleConnection(conn *websocket.Conn, exchange structs.ExchangeConfig) {
 	// Graceful shutdown handling
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
+	defer signal.Stop(interrupt) // Cleanup signal handling
 
 	done := make(chan struct{})
 
-	// Start receiving incoming messages
+	messageQueue := make(chan []byte, 100)
+
+	go func() {
+		for message := range messageQueue {
+			HandleMessage(message, exchange)
+		}
+	}()
+
+	// Starts goroutine to start receiving incoming messages
 	go func() {
 		defer close(done)
 		for {
 			_, message, err := conn.ReadMessage()
 			if err != nil {
 				log.Printf("Error receiving message from exchange %s: %s\n", exchange.Name, err)
+				close(messageQueue) // Close message queue to allow worker to exit
 				return
 			}
-			go HandleMessage(message, exchange)
+
+			// Send message to the queue instead of spawning unlimited goroutines
+			select {
+			case messageQueue <- message:
+			default:
+				log.Println("Message queue full, dropping message")
+			}
 		}
 	}()
+
 	<-interrupt
 	log.Println("Interrupt received, closing connection...")
-	// Attempt graceful WebSocket close
+
 	if err := conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, "")); err != nil {
 		log.Printf("Error closing WebSocket connection for %s: %s\n", exchange.Name, err)
 	}
+
 	conn.Close()
 }
 
-func HandleMessage(message []byte, exchange structs.ExchangeConfig) {
-	// does some processing and saves it to a CSV file
-	// will write later
+// Little helper function to process message types
+func processMessageType(eventType string, message []byte, exchange string) {
+	switch eventType {
+	case "24hrTicker":
+		TickerData := HandleTickerMessage(message, exchange == "Binance_Global")
+		appendTickerBuffer(TickerData, exchange)
+	case "trade":
+		TradeData := HandleTradeMessage(message, exchange == "Binance_Global")
+		appendTradeBuffer(TradeData, exchange)
+	default:
+		log.Printf("Unhandled event type: %s | Exchange: %s\n", eventType, exchange)
+	}
 }
 
+// Check if message is wrapped or not
+func HandleMessage(message []byte, exchange structs.ExchangeConfig) {
+	var cMessage MessageCheck
+	if err := json.Unmarshal(message, &cMessage); err != nil {
+		log.Printf("Error parsing message: %s | Exchange: %s | Data: %s\n", err, exchange.Name, string(message)[:100])
+		return
+	}
+
+	if cMessage.Stream == "" {
+		// Unwrapped message
+		var pMessage USMessageStruct
+		if err := json.Unmarshal(message, &pMessage); err != nil {
+			log.Printf("Error parsing US message: %s | Data: %s\n", err, string(message)[:100])
+			return
+		}
+
+		processMessageType(pMessage.EventType, message, "Binance_US")
+
+	} else {
+		// Wrapped message
+		var pMessage GlobalMessageStruct
+		if err := json.Unmarshal(message, &pMessage); err != nil {
+			log.Printf("Error parsing global message: %s | Data: %s\n", err, string(message)[:100])
+			return
+		}
+
+		processMessageType(pMessage.Data.EventType, message, "Binance_Global")
+	}
+}
+
+// Handle Ticker Messages
+func HandleTickerMessage(message []byte, wrapped bool) structs.TickerData {
+	var pData structs.TickerData
+	if wrapped {
+
+	} else {
+
+	}
+
+	return pData
+}
+
+// Handle Trade Messages
+func HandleTradeMessage(message []byte, wrapped bool) structs.TradeData {
+	var pData structs.TradeData
+
+	if wrapped {
+
+	} else {
+
+	}
+
+	return pData
+}
+
+// Gracefully close the connection
 func CloseConnection(conn *websocket.Conn) {
-	// gracefully close the connection with the exchange
+	if conn == nil {
+		log.Println("CloseConnection called with nil connection")
+		return
+	}
+
+	// Create a close message with a normal closure code.
+	closeMsg := websocket.FormatCloseMessage(websocket.CloseNormalClosure, "Normal closure")
+
+	// Send the close message to the server.
+	if err := conn.WriteMessage(websocket.CloseMessage, closeMsg); err != nil {
+		log.Printf("Error sending close message: %v", err)
+		// Even if sending the close message fails, we'll proceed to close the connection.
+	}
+
+	// Optionally wait a moment to allow the close handshake to complete.
+	// This gives the server a chance to acknowledge our close message.
+	time.Sleep(1 * time.Second)
+
+	// Close the underlying connection.
+	if err := conn.Close(); err != nil {
+		log.Printf("Error closing connection: %v", err)
+	} else {
+		log.Println("Connection closed gracefully")
+	}
 }

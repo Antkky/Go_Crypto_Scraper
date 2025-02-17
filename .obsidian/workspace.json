@@ -4,21 +4,24 @@
     "type": "split",
     "children": [
       {
-        "id": "daa6671f81f39043",
+        "id": "af0a566d87dda125",
         "type": "tabs",
         "children": [
           {
-            "id": "833c178f9009d9f8",
+            "id": "00f56580d941d6c3",
             "type": "leaf",
             "state": {
-              "type": "markdown",
+              "type": "canvas",
               "state": {
-                "file": "Handle Connection.md",
-                "mode": "source",
-                "source": false
+                "file": "Process Flow Chart.canvas",
+                "viewState": {
+                  "x": 1064.4192426742609,
+                  "y": 1000.9994242314825,
+                  "zoom": -1.6666666666666665
+                }
               },
-              "icon": "lucide-file",
-              "title": "Handle Connection"
+              "icon": "lucide-layout-dashboard",
+              "title": "Process Flow Chart"
             }
           }
         ]
@@ -168,19 +171,21 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "833c178f9009d9f8",
+  "active": "ab0e27ca59e875b0",
   "lastOpenFiles": [
+    "Data File Structure.canvas",
+    "Handle Message.md",
     "Process Flow Chart.canvas",
+    "Handle Message 1.md",
+    "Unit Tests.md",
     "Handle Connection.md",
     "structs/structs.go",
     "structs",
     "main.md",
-    "Unit Tests.md",
     "obsidian_images/EstablishConnections 1.png",
     "obsidian_images/OpenParseJSON 1.png",
     "main_revised.go",
     "revised_main.go",
-    "Data File Structure.canvas",
     "Structs.md",
     "Go Crypto Scraper.md",
     "2025-02-12.md",
@@ -214,8 +219,6 @@
     "bybit/structs.md",
     "bybit/tests.md",
     "binance/tests.md",
-    "coinex/tests.md",
-    "binance/structs.md",
-    "binance/demo_server.md"
+    "coinex/tests.md"
   ]
 }

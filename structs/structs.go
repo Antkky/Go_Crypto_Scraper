@@ -13,10 +13,10 @@ type TickerData struct {
 	TimeStamp uint
 	Date      uint
 	Symbol    string
-	BidPrice  uint
-	BidSize   uint
-	AskPrice  uint
-	AskSize   uint
+	BidPrice  float32
+	BidSize   float32
+	AskPrice  float32
+	AskSize   float32
 }
 
 type TradeData struct {

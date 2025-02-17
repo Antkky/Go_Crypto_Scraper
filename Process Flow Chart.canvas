@@ -1,30 +1,30 @@
 {
 	"nodes":[
-		{"id":"7bbcba42399b1065","type":"text","text":"Add standardized Data to buffer correlating to the exchange, asset, and stream.","x":1560,"y":60,"width":250,"height":120,"color":"1"},
-		{"id":"0f8ad5c905ef5b29","type":"text","text":"Flush the data buffer depending on the sizes or time elapsed since last flush","x":1860,"y":60,"width":250,"height":120,"color":"2"},
-		{"id":"f8934476b12f6a04","type":"text","text":"Write rows to CSV file","x":2160,"y":90,"width":250,"height":60,"color":"4"},
-		{"id":"bd9a8b0f27e1adcc","type":"text","text":"Create Standardized Data Format","x":1560,"y":-120,"width":250,"height":60},
 		{"id":"0669796c3d7c50cd","type":"text","text":"Launch thread that continuously listens for data from the exchange server and ship it off to its correlating handler.","x":960,"y":40,"width":250,"height":160,"color":"3"},
 		{"id":"b4e7cb8e4e0453bc","type":"text","text":"Loop through config file and establish connection and sending subscription message","x":660,"y":60,"width":250,"height":120,"color":"4"},
-		{"id":"af0c0beac35262a8","type":"text","text":"Get a good understanding of this","x":1860,"y":300,"width":250,"height":60},
-		{"id":"336dd11f338fc913","type":"text","text":"Then, send all the CSV data files to AWS S3 and purge them to start collecting a new batch of data. ","x":2760,"y":40,"width":250,"height":160,"color":"1"},
-		{"id":"7083bb7e488420e6","type":"text","text":"At the 24hr mark, Disconnect from every exchange server","x":2460,"y":73,"width":250,"height":95,"color":"1"},
-		{"id":"0ec3c7ce58f875dd","type":"text","text":"Reconnect after sending & purging is done, starting a new batch of data.","x":3060,"y":57,"width":250,"height":127,"color":"1"},
-		{"id":"b14f20945483a542","type":"text","text":"Repeat","x":3360,"y":89,"width":250,"height":63,"color":"1"},
 		{"id":"0d76325eaf56bd20","type":"text","text":"Read & Parse JSON Config File","x":360,"y":80,"width":250,"height":80,"color":"4"},
 		{"id":"f68e4752c6f57085","type":"text","text":"Remember to add pinging task","x":960,"y":-120,"width":250,"height":60},
-		{"id":"cb850f640b023de8","type":"text","text":"Make sure you somehow close the goroutines that are collecting data for those exchanges","x":2460,"y":-180,"width":250,"height":120},
-		{"id":"3ff8f1ced1d4d274","type":"text","text":"Make sure you somehow close the goroutines that are collecting data for those exchanges","x":3060,"y":300,"width":250,"height":130},
 		{"id":"1ede56536068d305","type":"file","file":"obsidian_images/OpenParseJSON 1.png","x":285,"y":960,"width":400,"height":355},
 		{"id":"09ecb40759ee0c07","type":"file","file":"obsidian_images/EstablishConnections 1.png","x":785,"y":938,"width":333,"height":400},
-		{"id":"97bfb0d7e24692b9","x":1260,"y":0,"width":250,"height":240,"type":"file","file":"Handle Connection.md"},
-		{"id":"a51f6f4471bd9232","type":"text","text":"These are custom to the exchange","x":1085,"y":320,"width":250,"height":60}
+		{"id":"97bfb0d7e24692b9","type":"file","file":"Handle Connection.md","x":1260,"y":0,"width":250,"height":240},
+		{"id":"4a067c8255625550","type":"file","file":"Handle Message.md","x":1560,"y":0,"width":250,"height":240},
+		{"id":"cb850f640b023de8","type":"text","text":"Make sure you somehow close the goroutines that are collecting data for those exchanges","x":2780,"y":-180,"width":250,"height":120},
+		{"id":"7083bb7e488420e6","type":"text","text":"At the 24hr mark, Disconnect from every exchange server","x":2780,"y":73,"width":250,"height":95,"color":"1"},
+		{"id":"336dd11f338fc913","type":"text","text":"Then, send all the CSV data files to AWS S3 and purge them to start collecting a new batch of data. ","x":3080,"y":40,"width":250,"height":160,"color":"1"},
+		{"id":"0ec3c7ce58f875dd","type":"text","text":"Reconnect after sending & purging is done, starting a new batch of data.","x":3380,"y":57,"width":250,"height":127,"color":"1"},
+		{"id":"3ff8f1ced1d4d274","type":"text","text":"Make sure you somehow close the goroutines that are collecting data for those exchanges","x":3380,"y":300,"width":250,"height":130},
+		{"id":"b14f20945483a542","type":"text","text":"Repeat","x":3680,"y":89,"width":250,"height":63,"color":"1"},
+		{"id":"f8934476b12f6a04","type":"text","text":"Write rows to CSV file","x":2480,"y":90,"width":250,"height":60,"color":"4"},
+		{"id":"0f8ad5c905ef5b29","type":"text","text":"Flush the data buffer depending on the sizes or time elapsed since last flush","x":2180,"y":60,"width":250,"height":120,"color":"2"},
+		{"id":"af0c0beac35262a8","type":"text","text":"Get a good understanding of this","x":2180,"y":300,"width":250,"height":60},
+		{"id":"bd9a8b0f27e1adcc","type":"text","text":"Create Standardized Data Format","x":1880,"y":-120,"width":250,"height":60},
+		{"id":"7bbcba42399b1065","type":"text","text":"Add standardized Data to buffer correlating to the exchange, asset, and stream.","x":1880,"y":60,"width":250,"height":120,"color":"1"},
+		{"id":"a51f6f4471bd9232","type":"text","text":"These are custom to the exchange","x":1085,"y":400,"width":250,"height":60}
 	],
 	"edges":[
 		{"id":"b00107de0380167f","fromNode":"b4e7cb8e4e0453bc","fromSide":"right","toNode":"0669796c3d7c50cd","toSide":"left"},
 		{"id":"a5accff1765b0df0","fromNode":"7bbcba42399b1065","fromSide":"right","toNode":"0f8ad5c905ef5b29","toSide":"left"},
 		{"id":"f49806631bfad245","fromNode":"0f8ad5c905ef5b29","fromSide":"right","toNode":"f8934476b12f6a04","toSide":"left"},
-		{"id":"0e949260f41f3965","fromNode":"97bfb0d7e24692b9","fromSide":"right","toNode":"7bbcba42399b1065","toSide":"left"},
 		{"id":"338d6c623e586eb2","fromNode":"0669796c3d7c50cd","fromSide":"right","toNode":"97bfb0d7e24692b9","toSide":"left"},
 		{"id":"d4932df26cd77770","fromNode":"bd9a8b0f27e1adcc","fromSide":"bottom","toNode":"7bbcba42399b1065","toSide":"top"},
 		{"id":"df0fbc8f8d53227a","fromNode":"a51f6f4471bd9232","fromSide":"top","toNode":"97bfb0d7e24692b9","toSide":"bottom"},
@@ -38,6 +38,9 @@
 		{"id":"1e7ae7b8d894f3f3","fromNode":"a51f6f4471bd9232","fromSide":"top","toNode":"0669796c3d7c50cd","toSide":"bottom"},
 		{"id":"f568655654e6d4e7","fromNode":"f68e4752c6f57085","fromSide":"bottom","toNode":"0669796c3d7c50cd","toSide":"top"},
 		{"id":"079969b002afd8db","fromNode":"0d76325eaf56bd20","fromSide":"right","toNode":"b4e7cb8e4e0453bc","toSide":"left"},
-		{"id":"4b2ab20f6c8aab4f","fromNode":"1ede56536068d305","fromSide":"right","toNode":"09ecb40759ee0c07","toSide":"left"}
+		{"id":"4b2ab20f6c8aab4f","fromNode":"1ede56536068d305","fromSide":"right","toNode":"09ecb40759ee0c07","toSide":"left"},
+		{"id":"40b3ea7375b08b96","fromNode":"97bfb0d7e24692b9","fromSide":"right","toNode":"4a067c8255625550","toSide":"left"},
+		{"id":"80ec66d4211b2ee0","fromNode":"4a067c8255625550","fromSide":"right","toNode":"7bbcba42399b1065","toSide":"left"},
+		{"id":"f6d393536aba12cb","fromNode":"a51f6f4471bd9232","fromSide":"top","toNode":"4a067c8255625550","toSide":"bottom"}
 	]
 }

@@ -7,8 +7,11 @@ import (
 	"os"
 	"sync"
 	"time"
+
+	"github.com/Antkky/go_crypto_scraper/structs"
 )
 
+// batch size for saving to csv
 var batchSize uint = 256
 
 type dataStore struct {
@@ -17,21 +20,31 @@ type dataStore struct {
 }
 
 var (
-	binanceTickerData = &dataStore{data: make(map[string][][]string)}
-	binanceTradeData = &dataStore{data: make(map[string][][]string)}
+	binanceTickerData    = &dataStore{data: make(map[string][][]string)}
+	binanceTradeData     = &dataStore{data: make(map[string][][]string)}
 	binanceLastFlushTime sync.Map
 )
 
+func appendTickerBuffer(data structs.TickerData, exchange string) {
+	// there should be 2 types of buffers, 1 for the binance US, and 1 for Binance Global
+}
+
+func appendTradeBuffer(data structs.TradeData, exchange string) {
+	// there should be 2 types of buffers, 1 for the binance US, and 1 for Binance Global
+}
+
+// idk
 func updateStoredRows(symbol string, store *dataStore, rows ...[]string) {
 	store.Lock()
 	defer store.Unlock()
 
 	if store.data[symbol] == nil {
-			store.data[symbol] = make([][]string, 0)
+		store.data[symbol] = make([][]string, 0)
 	}
 	store.data[symbol] = append(store.data[symbol], rows...)
 }
 
+// idk
 func flushRowsToCSV(symbol string, exchange string, filename string, store *dataStore, filetype string) error {
 	dir := fmt.Sprintf("data/%s/%s", exchange, symbol)
 	filePath := fmt.Sprintf("%s/%s", dir, filename)
@@ -49,12 +62,12 @@ func flushRowsToCSV(symbol string, exchange string, filename string, store *data
 	}
 
 	lastFlushTimeVal, _ := binanceLastFlushTime.LoadOrStore(symbol, time.Time{})
-  lastFlushTime, _ := lastFlushTimeVal.(time.Time)
+	lastFlushTime, _ := lastFlushTimeVal.(time.Time)
 
 	if rowCount >= int(batchSize) || time.Since(lastFlushTime) > 5*time.Second {
 		if err := writeRowsToCSV(filePath, rows, filetype); err != nil {
-				log.Println("Error writing CSV:", err)
-				return err
+			log.Println("Error writing CSV:", err)
+			return err
 		}
 
 		store.Lock()
@@ -67,6 +80,7 @@ func flushRowsToCSV(symbol string, exchange string, filename string, store *data
 	return nil
 }
 
+// idk
 func writeRowsToCSV(filePath string, rows [][]string, fileType string) error {
 	file, err := os.OpenFile(filePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
@@ -80,9 +94,9 @@ func writeRowsToCSV(filePath string, rows [][]string, fileType string) error {
 
 	var header []string
 	if fileType == "Ticker" {
-		header = []string{"TimeStamp", "Date"}//Header here
+		header = []string{"TimeStamp", "Date"} //Header here
 	} else if fileType == "Trades" {
-		header = []string{"TimeStamp", "Date"}//Header here
+		header = []string{"TimeStamp", "Date"} //Header here
 	}
 
 	fileStats, err := file.Stat()
