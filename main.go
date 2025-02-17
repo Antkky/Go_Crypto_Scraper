@@ -16,6 +16,7 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+// test this i think
 func GracefulShutdown(connections []*websocket.Conn) {
 	// Create a channel to listen for shutdown signals
 	sigChan := make(chan os.Signal, 1)
@@ -37,6 +38,7 @@ func GracefulShutdown(connections []*websocket.Conn) {
 	log.Println("All connections closed.")
 }
 
+// test this
 func ConnectExchange(exchange structs.ExchangeConfig) (*websocket.Conn, error) {
 	conn, _, err := websocket.DefaultDialer.Dial(exchange.URI, nil)
 	if err != nil {
@@ -45,6 +47,7 @@ func ConnectExchange(exchange structs.ExchangeConfig) (*websocket.Conn, error) {
 	return conn, nil
 }
 
+// test this
 func RouteSubscribe(exchange structs.ExchangeConfig, conn *websocket.Conn) error {
 	// Loop Through Streams
 	var streams []map[string]interface{}

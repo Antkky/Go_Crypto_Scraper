@@ -83,17 +83,27 @@ func HandleConnection(conn *websocket.Conn, exchange structs.ExchangeConfig) {
 }
 
 // Little helper function to process message types
-func processMessageType(eventType string, message []byte, exchange string) {
+func processMessageType(eventType string, message []byte, exchange string) error {
+	// params handling
+
 	switch eventType {
 	case "24hrTicker":
-		TickerData := HandleTickerMessage(message, exchange == "Binance_Global")
+		TickerData, err := HandleTickerMessage(message, true)
+		if err != nil {
+			return err
+		}
 		appendTickerBuffer(TickerData, exchange)
 	case "trade":
-		TradeData := HandleTradeMessage(message, exchange == "Binance_Global")
+		TradeData, err := HandleTradeMessage(message, true)
+		if err != nil {
+			return err
+		}
 		appendTradeBuffer(TradeData, exchange)
 	default:
 		log.Printf("Unhandled event type: %s | Exchange: %s\n", eventType, exchange)
 	}
+
+	return nil
 }
 
 // Check if message is wrapped or not
@@ -112,7 +122,10 @@ func HandleMessage(message []byte, exchange structs.ExchangeConfig) {
 			return
 		}
 
-		processMessageType(pMessage.EventType, message, "Binance_US")
+		if err := processMessageType(pMessage.EventType, message, "Binance_US"); err != nil {
+			log.Printf("Error Processing Message Type") // fix this
+			return
+		}
 
 	} else {
 		// Wrapped message
@@ -127,7 +140,7 @@ func HandleMessage(message []byte, exchange structs.ExchangeConfig) {
 }
 
 // Handle Ticker Messages
-func HandleTickerMessage(message []byte, wrapped bool) structs.TickerData {
+func HandleTickerMessage(message []byte, wrapped bool) (structs.TickerData, error) {
 	var pData structs.TickerData
 	if wrapped {
 
@@ -135,11 +148,11 @@ func HandleTickerMessage(message []byte, wrapped bool) structs.TickerData {
 
 	}
 
-	return pData
+	return pData, nil
 }
 
 // Handle Trade Messages
-func HandleTradeMessage(message []byte, wrapped bool) structs.TradeData {
+func HandleTradeMessage(message []byte, wrapped bool) (structs.TradeData, error) {
 	var pData structs.TradeData
 
 	if wrapped {
@@ -148,7 +161,7 @@ func HandleTradeMessage(message []byte, wrapped bool) structs.TradeData {
 
 	}
 
-	return pData
+	return pData, nil
 }
 
 // Gracefully close the connection

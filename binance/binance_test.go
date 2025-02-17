@@ -8,10 +8,12 @@ import (
 )
 
 type TestCase struct {
-	name     string
-	message  []byte
-	wrapped  bool
-	expected structs.TickerData
+	name       string
+	message    []byte
+	wrapped    bool
+	expected   structs.TickerData
+	errorValue error
+	wantError  bool
 }
 
 func TestHandleTickerMessage(t *testing.T) {
@@ -195,7 +197,10 @@ func TestHandleTickerMessage(t *testing.T) {
 	// run tests
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := HandleTickerMessage(tt.message, tt.wrapped)
+			result, err := HandleTickerMessage(tt.message, tt.wrapped)
+			if !assert.Nil(t, err) {
+				t.Errorf("Returned error: %+v, got %+v", err, result)
+			}
 			if !assert.Equal(t, result, tt.expected, "Should Be Equal") {
 				t.Errorf("Expected %+v, got %+v", tt.expected, result)
 			}
