@@ -9,6 +9,7 @@ type ExchangeConfig struct {
 	Ping    json.RawMessage `json:"ping,omitempty"`
 }
 
+// add some functionallity
 type TickerData struct {
 	TimeStamp uint
 	Date      uint
