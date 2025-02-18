@@ -11,7 +11,6 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-// test this
 func RouteSubscribe(exchange structs.ExchangeConfig, conn *websocket.Conn) error {
 	// Loop Through Streams
 	var streams []map[string]interface{}
@@ -33,7 +32,6 @@ func RouteSubscribe(exchange structs.ExchangeConfig, conn *websocket.Conn) error
 	return nil
 }
 
-// test this i think
 func GracefulShutdown(connections []*websocket.Conn) {
 	// Create a channel to listen for shutdown signals
 	sigChan := make(chan os.Signal, 1)

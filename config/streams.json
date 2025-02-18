@@ -1,138 +1,138 @@
 [
-    {
-        "name": "Binance US",
-        "uri": "wss://stream.binance.us:9443/ws",
-        "streams": [
-            {
-                "method": "SUBSCRIBE",
-                "params": [
-                    "btcusdt@trade",
-                    "btcusdt@ticker",
-                    "ethusdt@trade",
-                    "ethusdt@ticker"
-                ],
-                "id": 1
-            }
+  {
+    "name": "Binance US",
+    "uri": "wss://stream.binance.us:9443/ws",
+    "streams": [
+      {
+        "method": "SUBSCRIBE",
+        "params": [
+          "btcusdt@trade",
+          "btcusdt@ticker",
+          "ethusdt@trade",
+          "ethusdt@ticker"
+        ],
+        "id": 1
+      }
+    ]
+  },
+  {
+    "name": "Binance Global",
+    "uri": "wss://data-stream.binance.vision/stream",
+    "streams": [
+      {
+        "method": "SUBSCRIBE",
+        "params": [
+          "btcusdt@trade",
+          "btcusdt@ticker",
+          "ethusdt@trade",
+          "ethusdt@ticker"
+        ],
+        "id": 1
+      }
+    ]
+  },
+  {
+    "name": "Bybit Spot",
+    "uri": "wss://stream.bybit.com/v5/public/spot",
+    "streams": [
+      {
+        "op": "subscribe",
+        "args": [
+          "publicTrade.BTCUSDT",
+          "tickers.BTCUSDT",
+          "publicTrade.ETHUSDT",
+          "tickers.ETHUSDT"
         ]
-    },
-    {
-        "name": "Binance Global",
-        "uri": "wss://data-stream.binance.vision/stream",
-        "streams": [
-            {
-                "method": "SUBSCRIBE",
-                "params": [
-                    "btcusdt@trade",
-                    "btcusdt@ticker",
-                    "ethusdt@trade",
-                    "ethusdt@ticker"
-                ],
-                "id": 1
-            }
-        ]
-    },
-    {
-        "name": "Bybit Spot",
-        "uri": "wss://stream.bybit.com/v5/public/spot",
-        "streams": [
-            {
-                "op": "subscribe",
-                "args": [
-                    "publicTrade.BTCUSDT",
-                    "tickers.BTCUSDT",
-                    "publicTrade.ETHUSDT",
-                    "tickers.ETHUSDT"
-                ]
-            }
-        ],
-        "ping": {
-            "op": "ping"
-        }
-    },
-    {
-        "name": "Bybit Futures",
-        "uri": "wss://stream.bybit.com/v5/public/linear",
-        "streams": [
-            {
-                "op": "subscribe",
-                "args": [
-                    "publicTrade.BTCUSDT",
-                    "tickers.BTCUSDT",
-                    "publicTrade.ETHUSDT",
-                    "tickers.ETHUSDT"
-                ]
-            }
-        ],
-        "ping": {
-            "op": "ping"
-        }
-    },
-    {
-        "name": "Coinex Spot",
-        "uri": "wss://socket.coinex.com/v2/spot",
-        "streams": [
-            {
-                "method": "bbo.subscribe",
-                "params": { "market_list": ["BTCUSDT", "ETHUSDT"] },
-                "id": 1
-            },
-            {
-                "method": "deals.subscribe",
-                "params": { "market_list": ["BTCUSDT", "ETHUSDT"] },
-                "id": 1
-            }
-        ],
-        "ping": {
-            "method": "server.ping",
-            "params": {},
-            "id": 1
-        }
-    },
-    {
-        "name": "Coinex Futures",
-        "uri": "wss://socket.coinex.com/v2/futures",
-        "streams": [
-            {
-                "method": "bbo.subscribe",
-                "params": { "market_list": ["BTCUSDT", "ETHUSDT"] },
-                "id": 1
-            },
-            {
-                "method": "deals.subscribe",
-                "params": { "market_list": ["BTCUSDT", "ETHUSDT"] },
-                "id": 1
-            }
-        ],
-        "ping": {
-            "method": "server.ping",
-            "params": {},
-            "id": 1
-        }
-    },
-    {
-        "name": "Bitfinex",
-        "uri": "wss://api-pub.bitfinex.com/ws/2",
-        "streams": [
-            {
-                "event": "subscribe",
-                "channel": "ticker",
-                "symbol": "tBTCUSD"
-            },
-            {
-                "event": "subscribe",
-                "channel": "trades",
-                "symbol": "tBTCUSD"
-            },
-            {
-                "event": "subscribe",
-                "channel": "ticker",
-                "symbol": "tETHUSD"
-            },
-            {
-                "event": "subscribe",
-                "channel": "trades",
-                "symbol": "tETHUSD"
-            }
-        ]
+      }
+    ],
+    "ping": {
+      "op": "ping"
     }
+  },
+  {
+    "name": "Bybit Futures",
+    "uri": "wss://stream.bybit.com/v5/public/linear",
+    "streams": [
+      {
+        "op": "subscribe",
+        "args": [
+          "publicTrade.BTCUSDT",
+          "tickers.BTCUSDT",
+          "publicTrade.ETHUSDT",
+          "tickers.ETHUSDT"
+        ]
+      }
+    ],
+    "ping": {
+      "op": "ping"
+    }
+  },
+  {
+    "name": "Coinex Spot",
+    "uri": "wss://socket.coinex.com/v2/spot",
+    "streams": [
+      {
+        "method": "bbo.subscribe",
+        "params": { "market_list": ["BTCUSDT", "ETHUSDT"] },
+        "id": 1
+      },
+      {
+        "method": "deals.subscribe",
+        "params": { "market_list": ["BTCUSDT", "ETHUSDT"] },
+        "id": 1
+      }
+    ],
+    "ping": {
+      "method": "server.ping",
+      "params": {},
+      "id": 1
+    }
+  },
+  {
+    "name": "Coinex Futures",
+    "uri": "wss://socket.coinex.com/v2/futures",
+    "streams": [
+      {
+        "method": "bbo.subscribe",
+        "params": { "market_list": ["BTCUSDT", "ETHUSDT"] },
+        "id": 1
+      },
+      {
+        "method": "deals.subscribe",
+        "params": { "market_list": ["BTCUSDT", "ETHUSDT"] },
+        "id": 1
+      }
+    ],
+    "ping": {
+      "method": "server.ping",
+      "params": {},
+      "id": 1
+    }
+  },
+  {
+    "name": "Bitfinex",
+    "uri": "wss://api-pub.bitfinex.com/ws/2",
+    "streams": [
+      {
+        "event": "subscribe",
+        "channel": "ticker",
+        "symbol": "tBTCUSD"
+      },
+      {
+        "event": "subscribe",
+        "channel": "trades",
+        "symbol": "tBTCUSD"
+      },
+      {
+        "event": "subscribe",
+        "channel": "ticker",
+        "symbol": "tETHUSD"
+      },
+      {
+        "event": "subscribe",
+        "channel": "trades",
+        "symbol": "tETHUSD"
+      }
+    ]
+  }
 ]

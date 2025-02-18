@@ -77,7 +77,7 @@ func HandleConnection(conn *websocket.Conn, exchange structs.ExchangeConfig) {
 	conn.Close()
 }
 
-func processMessageType(eventType string, message []byte, wrapped bool) (structs.TickerData, structs.TradeData, error) {
+func ProcessMessageType(eventType string, message []byte, wrapped bool) (structs.TickerData, structs.TradeData, error) {
 	if eventType == "" || len(message) == 0 {
 		return structs.TickerData{}, structs.TradeData{}, errors.New("invalid parameters")
 	}
@@ -111,7 +111,7 @@ func HandleMessage(message []byte, exchange structs.ExchangeConfig) error {
 			log.Printf("Error parsing US message: %s | Data: %s\n", err, string(message)[:100])
 			return err
 		}
-		tkrData, trdData, err := processMessageType(pMessage.EventType, message, false)
+		tkrData, trdData, err := ProcessMessageType(pMessage.EventType, message, false)
 		if err != nil {
 			log.Printf("Error Processing Message Type %s from exchange %s.\nError Code: %s", pMessage.EventType, exchange.Name, err)
 			return err
@@ -127,7 +127,7 @@ func HandleMessage(message []byte, exchange structs.ExchangeConfig) error {
 			log.Printf("Error parsing global message: %s | Data: %s\n", err, string(message)[:100])
 			return err
 		}
-		tkrData, trdData, err := processMessageType(pMessage.Data.EventType, message, true)
+		tkrData, trdData, err := ProcessMessageType(pMessage.Data.EventType, message, true)
 		if err != nil {
 			log.Printf("Error Processing Message Type %s from exchange %s.\nError Code: %s", pMessage.Data.EventType, exchange.Name, err)
 			return err
@@ -141,7 +141,6 @@ func HandleMessage(message []byte, exchange structs.ExchangeConfig) error {
 	return nil
 }
 
-// Handle Ticker Messages
 func HandleTickerMessage(message []byte, wrapped bool) (structs.TickerData, error) {
 	var pData structs.TickerData
 	if wrapped {
@@ -152,7 +151,6 @@ func HandleTickerMessage(message []byte, wrapped bool) (structs.TickerData, erro
 	return pData, nil
 }
 
-// Handle Trade Messages
 func HandleTradeMessage(message []byte, wrapped bool) (structs.TradeData, error) {
 	var pData structs.TradeData
 	if wrapped {
@@ -163,7 +161,6 @@ func HandleTradeMessage(message []byte, wrapped bool) (structs.TradeData, error)
 	return pData, nil
 }
 
-// Gracefully close the connection
 func CloseConnection(conn *websocket.Conn) {
 	if conn == nil {
 		log.Println("CloseConnection called with nil connection")
