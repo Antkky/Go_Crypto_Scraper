@@ -7,26 +7,227 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// Main Stuff
+// _____________Main Stuff_____________
+
+// ProcessMessageType
+var ProcessMessageTypeTestCases = []struct {
+	name       string
+	eventType  string
+	message    []byte
+	wrapped    bool
+	r1         structs.TickerData
+	r2         structs.TradeData
+	errorValue error
+	wantError  bool
+}{
+	// Unwrapped valid message
+	{
+		name:      "unwrapped valid message1",
+		eventType: "24hrMiniTicker",
+		message: []byte(`{}
+			"e": "24hrTicker",
+			"E": 1672515782136,
+			"s": "BNBBTC",
+			"p": "0.0015",
+			"P": "250.00",
+			"w": "0.0018",
+			"x": "0.0009",
+			"c": "0.0025",
+			"Q": "10",
+			"b": "0.0024",
+			"B": "10",
+			"a": "0.0026",
+			"A": "100",
+			"o": "0.0010",
+			"h": "0.0025",
+			"l": "0.0010",
+			"v": "10000",
+			"q": "18",
+			"O": 0,
+			"C": 86400000,
+			"F": 0,
+			"L": 18150,
+			"n": 18151
+		}`),
+		wrapped: false,
+		r1: structs.TickerData{
+			TimeStamp: 1028413123,
+			Date:      1823123,
+			Symbol:    "BTCUSDT",
+			BidPrice:  97245.24,
+			BidSize:   53,
+			AskPrice:  97260.20,
+			AskSize:   42,
+		},
+		r2:         structs.TradeData{},
+		errorValue: nil,
+		wantError:  false,
+	},
+
+	// Wrapped valid message
+	{
+		name:      "wrapped valid message1",
+		eventType: "24hrMiniTicker",
+		message: []byte(`{
+			"stream": "BTCUSDT@ticker",
+			"data": {
+				"e": "24hrTicker",
+				"E": 1672515782136,
+				"s": "BNBBTC",
+				"p": "0.0015",
+				"P": "250.00",
+				"w": "0.0018",
+				"x": "0.0009",
+				"c": "0.0025",
+				"Q": "10",
+				"b": "0.0024",
+				"B": "10",
+				"a": "0.0026",
+				"A": "100",
+				"o": "0.0010",
+				"h": "0.0025",
+				"l": "0.0010",
+				"v": "10000",
+				"q": "18",
+				"O": 0,
+				"C": 86400000,
+				"F": 0,
+				"L": 18150,
+				"n": 18151
+			}
+		}`),
+		wrapped: true,
+		r1: structs.TickerData{
+			TimeStamp: 1028413123,
+			Date:      1823123,
+			Symbol:    "BTCUSDT",
+			BidPrice:  97245.24,
+			BidSize:   53,
+			AskPrice:  97260.20,
+			AskSize:   42,
+		},
+		r2:         structs.TradeData{},
+		errorValue: nil,
+		wantError:  false,
+	},
+
+	// Unwrapped invalid message
+	{
+		name:      "unwrapped invalid message1",
+		eventType: "24hrMiniTicker",
+		message: []byte(`{
+			"stream": "BTCUSDT@ticker",
+			"data": {
+				"e": "24hrTicker",
+				"E": 1672515782136,
+				"s": "BNBBTC",
+				"p": "0.0015",
+				"P": "250.00",
+				"w": "0.0018",
+				"x": "0.0009",
+				"c": "0.0025",
+				"Q": "10",
+				"b": "0.0024",
+				"B": "10",
+				"a": "0.0026",
+				"A": "100",
+				"o": "0.0010",
+				"h": "0.0025",
+				"l": "0.0010",
+				"v": "10000",
+				"q": "18",
+				"O": 0,
+				"C": 86400000,
+				"F": 0,
+				"L": 18150,
+				"n": 18151
+			}
+		}`),
+		wrapped: false,
+		r1: structs.TickerData{
+			TimeStamp: 1028413123,
+			Date:      1823123,
+			Symbol:    "BTCUSDT",
+			BidPrice:  97245.24,
+			BidSize:   53,
+			AskPrice:  97260.20,
+			AskSize:   42,
+		},
+		r2:         structs.TradeData{},
+		errorValue: nil,
+		wantError:  true,
+	},
+
+	// Wrapped invalid message
+	{
+		name:      "wrapped invalid message1",
+		eventType: "24hrMiniTicker",
+		message: []byte(`{
+			"stream": "BTCUSDT@ticker",
+			"data": {
+				"e": "24hrTicker",
+				"E": 1672515782136,
+				"s": "BNBBTC",
+				"p": "0.0015",
+				"P": "250.00",
+				"w": "0.0018",
+				"x": "0.0009",
+				"c": "0.0025",
+				"Q": "10",
+				"b": "0.0024",
+				"B": "10",
+				"a": "0.0026",
+				"A": "100",
+				"o": "0.0010",
+				"h": "0.0025",
+				"l": "0.0010",
+				"v": "10000",
+				"q": "18",
+				"O": 0,
+				"C": 86400000,
+				"F": 0,
+				"L": 18150,
+				"n": 18151
+			}
+		}`),
+		wrapped: true,
+		r1: structs.TickerData{
+			TimeStamp: 1028413123,
+			Date:      1823123,
+			Symbol:    "BTCUSDT",
+			BidPrice:  97245.24,
+			BidSize:   53,
+			AskPrice:  97260.20,
+			AskSize:   42,
+		},
+		r2:         structs.TradeData{},
+		errorValue: nil,
+		wantError:  true,
+	},
+
+	// Invalid JSON message
+	{
+		name:      "invalid json message1",
+		eventType: "24hrMiniTicker",
+		message:   []byte(`{invalid json}`),
+		wrapped:   false,
+		r1: structs.TickerData{
+			TimeStamp: 1028413123,
+			Date:      1823123,
+			Symbol:    "BTCUSDT",
+			BidPrice:  97245.24,
+			BidSize:   53,
+			AskPrice:  97260.20,
+			AskSize:   42,
+		},
+		r2:         structs.TradeData{},
+		errorValue: nil,
+		wantError:  true,
+	},
+}
+
 func TestProcessMessageType(t *testing.T) {
-	tests := []struct {
-		name       string
-		eventType  string
-		message    []byte
-		wrapped    bool
-		r1         structs.TickerData
-		r2         structs.TradeData
-		errorValue error
-		wantError  bool
-	}{
-		// Test Cases
-		{name: "unwrapped valid message1", eventType: "24hrMiniTicker", message: TestCasesByteArrays[0], wrapped: false, r1: TestCasesR1[0], r2: TestCasesR2[0], errorValue: nil, wantError: false},
-		{name: "wrapped valid message1", eventType: "24hrMiniTicker", message: TestCasesByteArrays[1], wrapped: true, r1: TestCasesR1[1], r2: TestCasesR2[1], errorValue: nil, wantError: false},
-		{name: "unwrapped invalid message1", eventType: "24hrMiniTicker", message: TestCasesByteArrays[2], wrapped: false, r1: TestCasesR1[2], r2: TestCasesR2[2], errorValue: nil, wantError: true},
-		{name: "wrapped invalid message1", eventType: "24hrMiniTicker", message: TestCasesByteArrays[3], wrapped: true, r1: TestCasesR1[3], r2: TestCasesR2[3], errorValue: nil, wantError: true},
-		{name: "invalid json message1", eventType: "24hrMiniTicker", message: TestCasesByteArrays[4], wrapped: false, r1: TestCasesR1[4], r2: TestCasesR2[4], errorValue: nil, wantError: true},
-	}
-	for _, tt := range tests {
+	for _, tt := range ProcessMessageTypeTestCases {
 		t.Run(tt.name, func(t *testing.T) {
 			r1, r2, err := ProcessMessageType(tt.eventType, tt.message, tt.wrapped)
 
@@ -49,19 +250,20 @@ func TestProcessMessageType(t *testing.T) {
 		})
 	}
 }
+
+// HandleMessage
+var HandleMessageTestCases = []struct {
+	name       string
+	message    []byte
+	exchange   structs.ExchangeConfig
+	errorValue error
+	wantError  bool
+}{
+	{},
+}
+
 func TestHandleMessage(t *testing.T) {
-	// declare tests
-	tests := []struct {
-		name       string
-		message    []byte
-		exchange   structs.ExchangeConfig
-		errorValue error
-		wantError  bool
-	}{
-		// Test Cases
-		{},
-	}
-	for _, tt := range tests {
+	for _, tt := range HandleMessageTestCases {
 		t.Run(tt.name, func(t *testing.T) {
 			// Run Test
 			err := HandleMessage(tt.message, tt.exchange)
@@ -76,7 +278,7 @@ func TestHandleMessage(t *testing.T) {
 	}
 }
 
-// Ticker & Trade Handlers
+// _____________Ticker & Trade Handlers_____________
 func TestHandleTickerMessage(t *testing.T) {
 	tests := []struct {
 		name       string
