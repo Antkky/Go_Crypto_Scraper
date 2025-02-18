@@ -1,8 +1,7 @@
 package binance
 
 import (
-	"encoding/csv"
-	"fmt"
+	"encoding/json"
 	"log"
 	"os"
 	"sync"
@@ -11,111 +10,66 @@ import (
 	"github.com/Antkky/go_crypto_scraper/structs"
 )
 
-// batch size for saving to csv
-var batchSize uint = 256
-
-type dataStore struct {
-	sync.RWMutex
-	data map[string][][]string
+type BufferedSaver struct {
+	buffer      []structs.TickerData
+	bufferSize  int
+	mutex       sync.Mutex
+	flushTicker *time.Ticker
 }
 
-var (
-	binanceTickerData    = &dataStore{data: make(map[string][][]string)}
-	binanceTradeData     = &dataStore{data: make(map[string][][]string)}
-	binanceLastFlushTime sync.Map
-)
-
-func appendTickerBuffer(data structs.TickerData, exchange string) {
-	// there should be 2 types of buffers, 1 for the binance US, and 1 for Binance Global
-}
-
-func appendTradeBuffer(data structs.TradeData, exchange string) {
-	// there should be 2 types of buffers, 1 for the binance US, and 1 for Binance Global
-}
-
-// idk
-func updateStoredRows(symbol string, store *dataStore, rows ...[]string) {
-	store.Lock()
-	defer store.Unlock()
-
-	if store.data[symbol] == nil {
-		store.data[symbol] = make([][]string, 0)
-	}
-	store.data[symbol] = append(store.data[symbol], rows...)
-}
-
-// idk
-func flushRowsToCSV(symbol string, exchange string, filename string, store *dataStore, filetype string) error {
-	dir := fmt.Sprintf("data/%s/%s", exchange, symbol)
-	filePath := fmt.Sprintf("%s/%s", dir, filename)
-
-	if err := os.MkdirAll(dir, os.ModePerm); err != nil {
-		log.Println("Error creating directory:", err)
-		return err
+func NewBufferedSaver(bufferSize int, flushInterval time.Duration) *BufferedSaver {
+	saver := &BufferedSaver{
+		buffer:      make([]structs.TickerData, 0, bufferSize),
+		bufferSize:  bufferSize,
+		flushTicker: time.NewTicker(flushInterval),
 	}
 
-	rows := store.data[symbol]
-	rowCount := len(rows)
-
-	if rowCount == 0 {
-		return nil
-	}
-
-	lastFlushTimeVal, _ := binanceLastFlushTime.LoadOrStore(symbol, time.Time{})
-	lastFlushTime, _ := lastFlushTimeVal.(time.Time)
-
-	if rowCount >= int(batchSize) || time.Since(lastFlushTime) > 5*time.Second {
-		if err := writeRowsToCSV(filePath, rows, filetype); err != nil {
-			log.Println("Error writing CSV:", err)
-			return err
-		}
-
-		store.Lock()
-		store.data[symbol] = make([][]string, 0)
-		store.Unlock()
-
-		binanceLastFlushTime.Store(symbol, time.Now())
-	}
-
-	return nil
+	// Start background flushing process
+	go saver.startFlusher()
+	return saver
 }
 
-// idk
-func writeRowsToCSV(filePath string, rows [][]string, fileType string) error {
-	file, err := os.OpenFile(filePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+func (bs *BufferedSaver) AppendData(data structs.TickerData) {
+	bs.mutex.Lock()
+	defer bs.mutex.Unlock()
+
+	bs.buffer = append(bs.buffer, data)
+	if len(bs.buffer) >= bs.bufferSize {
+		bs.flush()
+	}
+}
+
+func (bs *BufferedSaver) flush() {
+	if len(bs.buffer) == 0 {
+		return
+	}
+
+	log.Println("Flushing buffer to file...")
+	file, err := os.OpenFile("ticker_data.json", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
-		log.Println("Error opening CSV file:", err)
-		return err
+		log.Printf("Error opening file: %s\n", err)
+		return
 	}
 	defer file.Close()
 
-	writer := csv.NewWriter(file)
-	defer writer.Flush()
-
-	var header []string
-	if fileType == "Ticker" {
-		header = []string{"TimeStamp", "Date"} //Header here
-	} else if fileType == "Trades" {
-		header = []string{"TimeStamp", "Date"} //Header here
-	}
-
-	fileStats, err := file.Stat()
-	if err != nil {
-		log.Panicln("Error getting file stats: ", err)
-	}
-	if fileStats.Size() == 0 {
-		if err := writer.Write(header); err != nil {
-			log.Println("Error writing header to CSV: ", err)
-			return err
+	encoder := json.NewEncoder(file)
+	bs.mutex.Lock()
+	for _, data := range bs.buffer {
+		if err := encoder.Encode(data); err != nil {
+			log.Printf("Error writing to file: %s\n", err)
 		}
 	}
+	bs.buffer = bs.buffer[:0] // Clear buffer after writing
+	bs.mutex.Unlock()
+}
 
-	for _, row := range rows {
-		if err := writer.Write(row); err != nil {
-			log.Println("Error writing row to CSV file: ", err)
-			return err
-		}
+func (bs *BufferedSaver) startFlusher() {
+	for range bs.flushTicker.C {
+		bs.flush()
 	}
+}
 
-	return nil
+func (bs *BufferedSaver) Stop() {
+	bs.flushTicker.Stop()
+	bs.flush()
 }
