@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"os"
+	"strconv"
 )
 
 // Buffer Structs
@@ -21,13 +22,11 @@ type TradeDataBuffer struct {
 }
 
 // Method to add data to the buffer
-// buffer.AddData([]structs.TickerData)
 
 func (c *TickerDataBuffer) AddData(record []TickerDataStruct) {
 	c.buffer = append(c.buffer, record)
 	if len(c.buffer) >= c.maxSize {
 		c.FlushData()
-		c.buffer = nil
 	}
 }
 
@@ -35,20 +34,23 @@ func (c *TradeDataBuffer) AddData(record []TradeDataStruct) {
 	c.buffer = append(c.buffer, record)
 	if len(c.buffer) >= c.maxSize {
 		c.FlushData()
-		c.buffer = nil
 	}
 }
 
 // Method to save the buffer to a CSV file.
-// buffer.FlushData([]structs.TickerData)
 
-// these two functions are the same but for different structs
-func (c *TickerDataBuffer) FlushData() {
-	// Create or open the CSV file for appending.
+func (c *TickerDataBuffer) FlushData() error {
+	// Check if the file exists and is empty.
+	fileInfo, err := os.Stat(c.fileName)
+	isEmpty := os.IsNotExist(err) || (err == nil && fileInfo.Size() == 0)
+	if err != nil && !os.IsNotExist(err) {
+		return fmt.Errorf("error checking file: %w", err)
+	}
+
+	// Open or create the CSV file for appending.
 	file, err := os.OpenFile(c.fileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
-		fmt.Println("Error opening file:", err)
-		return
+		return fmt.Errorf("error opening file: %w", err)
 	}
 	defer file.Close()
 
@@ -56,22 +58,50 @@ func (c *TickerDataBuffer) FlushData() {
 	writer := csv.NewWriter(file)
 	defer writer.Flush()
 
-	// Write the data from the buffer to the CSV.
-	for _, record := range c.buffer {
-		err := writer.Write(record) // this takes in a string slice
-		if err != nil {
-			fmt.Println("Error writing record to CSV:", err)
+	// Write the header if the file is empty.
+	if isEmpty {
+		header := []string{"TimeStamp", "Date", "Symbol", "BidPrice", "BidSize", "AskPrice", "AskSize"}
+		if err := writer.Write(header); err != nil {
+			return fmt.Errorf("error writing CSV header: %w", err)
 		}
 	}
+
+	// Write data from buffer to CSV.
+	for _, batch := range c.buffer {
+		for _, record := range batch {
+			stringRecord := []string{
+				strconv.Itoa(int(record.TimeStamp)),
+				strconv.Itoa(int(record.Date)),
+				record.Symbol,
+				strconv.FormatFloat(float64(record.BidPrice), 'f', 4, 32),
+				strconv.FormatFloat(float64(record.BidSize), 'f', 4, 32),
+				strconv.FormatFloat(float64(record.AskPrice), 'f', 4, 32),
+				strconv.FormatFloat(float64(record.AskSize), 'f', 4, 32),
+			}
+			if err := writer.Write(stringRecord); err != nil {
+				return fmt.Errorf("error writing record to CSV: %w", err)
+			}
+		}
+	}
+
+	// Reset buffer efficiently.
+	c.buffer = nil
+
+	return nil
 }
 
-// these two functions are the same but for different structs
-func (c *TradeDataBuffer) FlushData() {
-	// Create or open the CSV file for appending.
+func (c *TradeDataBuffer) FlushData() error {
+	// Check if the file exists and is empty.
+	fileInfo, err := os.Stat(c.fileName)
+	isEmpty := os.IsNotExist(err) || (err == nil && fileInfo.Size() == 0)
+	if err != nil && !os.IsNotExist(err) {
+		return fmt.Errorf("error checking file: %w", err)
+	}
+
+	// Open or create the CSV file for appending.
 	file, err := os.OpenFile(c.fileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
-		fmt.Println("Error opening file:", err)
-		return
+		return fmt.Errorf("error opening file: %w", err)
 	}
 	defer file.Close()
 
@@ -79,17 +109,38 @@ func (c *TradeDataBuffer) FlushData() {
 	writer := csv.NewWriter(file)
 	defer writer.Flush()
 
-	// Write the data from the buffer to the CSV.
-	for _, record := range c.buffer {
-		err := writer.Write(record) // this takes in a string slice
-		if err != nil {
-			fmt.Println("Error writing record to CSV:", err)
+	// Write the header if the file is empty.
+	if isEmpty {
+		header := []string{"TimeStamp", "Date", "Symbol", "Price", "Quantity", "Bid_MM"}
+		if err := writer.Write(header); err != nil {
+			return fmt.Errorf("error writing CSV header: %w", err)
 		}
 	}
+
+	// Write data from buffer to CSV.
+	for _, batch := range c.buffer {
+		for _, record := range batch {
+			stringRecord := []string{
+				strconv.Itoa(int(record.TimeStamp)),
+				strconv.Itoa(int(record.Date)),
+				record.Symbol,
+				strconv.FormatFloat(float64(record.Price), 'f', 4, 32),    // Fixed precision
+				strconv.FormatFloat(float64(record.Quantity), 'f', 4, 32), // Fixed precision
+				strconv.FormatBool(record.Bid_MM),
+			}
+			if err := writer.Write(stringRecord); err != nil {
+				return fmt.Errorf("error writing record to CSV: %w", err)
+			}
+		}
+	}
+
+	// Reset buffer efficiently.
+	c.buffer = nil
+
+	return nil
 }
 
 // Create a new buffer
-// NewTickerCSVBuffer(100, "ticker.csv")
 
 func NewTickerCSVBuffer(maxSize int, fileName string) *TickerDataBuffer {
 	return &TickerDataBuffer{

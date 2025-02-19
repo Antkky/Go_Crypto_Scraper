@@ -24,8 +24,7 @@ type TradeDataStruct struct {
 	TimeStamp uint
 	Date      uint
 	Symbol    string
-	BidPrice  float32
-	BidSize   float32
-	AskPrice  float32
-	AskSize   float32
+	Price     float32
+	Quantity  float32
+	Bid_MM    bool
 }
