@@ -1,12 +1,10 @@
 package utils
 
-import "encoding/json"
-
 type ExchangeConfig struct {
-	Name    string          `json:"name"`
-	URI     string          `json:"uri"`
-	Streams json.RawMessage `json:"streams"`
-	Ping    json.RawMessage `json:"ping,omitempty"`
+	Name    string                   `json:"name"`
+	URI     string                   `json:"uri"`
+	Streams []map[string]interface{} `json:"streams"`
+	Ping    map[string]interface{}   `json:"ping,omitempty"`
 }
 
 // add some functionallity
@@ -20,14 +18,6 @@ type TickerDataStruct struct {
 	AskSize   float32
 }
 
-type TickerDataBuffer struct {
-	buffer     [][]TickerDataStruct
-	maxSize    int
-	dataStream string
-	filePath   string
-	fileName   string
-}
-
 type TradeDataStruct struct {
 	TimeStamp uint
 	Date      uint
@@ -37,10 +27,13 @@ type TradeDataStruct struct {
 	Bid_MM    bool
 }
 
-type TradeDataBuffer struct {
-	buffer     [][]TradeDataStruct
-	maxSize    int
-	dataStream string
-	filePath   string
-	fileName   string
+// Buffer Structs
+type DataBuffer struct {
+	tickerBuffer [][]TickerDataStruct
+	tradeBuffer  [][]TradeDataStruct
+	maxSize      int
+	dataType     string
+	dataStream   string
+	filePath     string
+	fileName     string
 }

@@ -26,22 +26,10 @@ import (
 // Description:
 //
 //	goroutine that subscribes and launches 2 goroutines to listen for messages and handle them
-func HandleConnection(conn *websocket.Conn, exchange utils.ExchangeConfig) {
+func HandleConnection(conn *websocket.Conn, exchange utils.ExchangeConfig, buffer utils.DataBuffer) {
 	if conn == nil {
 		log.Println("Connection is nil, exiting HandleConnection.")
 		return
-	}
-
-	streams, err := ParseStreams(exchange.Streams)
-	if err != nil {
-		log.Printf("Failed to parse streams for %s: %s", exchange.Name, err)
-		return
-	}
-
-	for _, stream := range streams {
-		if err := Subscribe(conn, stream, exchange.Name); err != nil {
-			log.Printf("Error subscribing to stream for %s: %s", exchange.Name, err)
-		}
 	}
 
 	interrupt := make(chan os.Signal, 1)
@@ -60,54 +48,6 @@ func HandleConnection(conn *websocket.Conn, exchange utils.ExchangeConfig) {
 	CloseConnection(conn, exchange.Name)
 }
 
-// ParseStreams()
-//
-// Inputs:
-//
-//	streamsData : json.RawMessage
-//
-// Outputs:
-//
-//	[]map[string]interface{}
-//	error
-//
-// Description:
-//
-//	turns the streamsData into a data type we can iterate over
-func ParseStreams(streamsData json.RawMessage) ([]map[string]interface{}, error) {
-	var streams []map[string]interface{}
-	if err := json.Unmarshal(streamsData, &streams); err != nil {
-		return nil, err
-	}
-	return streams, nil
-}
-
-// Subscribe()
-//
-// Inputs:
-//
-//	conn         : *websocket.Conn
-//	stream       : map[string]interface{}
-//	exchangeName : string
-//
-// Outputs:
-//
-//	error
-//
-// Description:
-//
-//	sends a subscribe message to the server
-func Subscribe(conn *websocket.Conn, stream map[string]interface{}, exchangeName string) error {
-	message, err := json.Marshal(stream)
-	if err != nil {
-		return err
-	}
-	if err := conn.WriteMessage(websocket.TextMessage, message); err != nil {
-		return err
-	}
-	return nil
-}
-
 // ConsumeMessages()
 //
 // Inputs:
@@ -124,12 +64,12 @@ func Subscribe(conn *websocket.Conn, stream map[string]interface{}, exchangeName
 //
 //	invoke the HandleMessage() function to process the message in the messageQueue
 func ConsumeMessages(messageQueue chan []byte, done chan struct{}, exchange utils.ExchangeConfig) {
-	defer close(done)
 	for message := range messageQueue {
 		if err := HandleMessage(message, exchange); err != nil {
 			log.Printf("Error handling message for %s: %v", exchange.Name, err)
 		}
 	}
+	close(done)
 }
 
 // ReceiveMessages()
@@ -149,7 +89,6 @@ func ConsumeMessages(messageQueue chan []byte, done chan struct{}, exchange util
 //
 //	sends received messages to the messageQueue channel
 func ReceiveMessages(conn *websocket.Conn, messageQueue chan []byte, done chan struct{}, exchange utils.ExchangeConfig) {
-	defer close(done)
 	for {
 		_, message, err := conn.ReadMessage()
 		if err != nil {
@@ -195,15 +134,14 @@ func ProcessMessageType(message []byte, tickerData *utils.TickerDataStruct, trad
 		if err := json.Unmarshal(message, tickerData); err != nil {
 			return err
 		}
-		return nil
 	case "trade":
 		if err := json.Unmarshal(message, tradeData); err != nil {
 			return err
 		}
-		return nil
 	default:
 		return errors.New("unhandled event type: " + eventType)
 	}
+	return nil
 }
 
 // HandleMessage()
@@ -230,12 +168,38 @@ func HandleMessage(message []byte, exchange utils.ExchangeConfig) error {
 		return err
 	}
 
-	if tickerData != nil {
-		// save ticker data
-	} else if tradeData != nil {
-		// save trade data
+	if (tickerData != utils.TickerDataStruct{}) {
+		log.Printf("Ticker data for %s", exchange.Name)
+	} else if (tradeData != utils.TradeDataStruct{}) {
+		log.Printf("Trade data for %s", exchange.Name)
 	}
 
+	return nil
+}
+
+// Subscribe()
+//
+// Inputs:
+//
+//	conn         : *websocket.Conn
+//	stream       : map[string]interface{}
+//	exchangeName : string
+//
+// Outputs:
+//
+//	error
+//
+// Description:
+//
+//	sends a subscribe message to the server
+func Subscribe(conn *websocket.Conn, stream map[string]interface{}) error {
+	message, err := json.Marshal(stream)
+	if err != nil {
+		return err
+	}
+	if err := conn.WriteMessage(websocket.TextMessage, message); err != nil {
+		return err
+	}
 	return nil
 }
 

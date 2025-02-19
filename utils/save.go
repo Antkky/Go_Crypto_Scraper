@@ -7,139 +7,113 @@ import (
 	"strconv"
 )
 
-// Method to add data to the buffer
+// Methods to add data to the buffer
+func (c *DataBuffer) AddData(record interface{}) error {
+	switch v := record.(type) {
+	case []TickerDataStruct:
+		c.tickerBuffer = append(c.tickerBuffer, v)
+		if len(c.tickerBuffer) >= c.maxSize {
+			return c.FlushData()
+		}
+	case []TradeDataStruct:
+		c.tradeBuffer = append(c.tradeBuffer, v)
+		if len(c.tradeBuffer) >= c.maxSize {
+			return c.FlushData()
+		}
+	default:
+		return fmt.Errorf("unsupported data type")
+	}
+	return nil
+}
 
-func (c *TickerDataBuffer) AddData(record []TickerDataStruct) {
-	c.buffer = append(c.buffer, record)
-	if len(c.buffer) >= c.maxSize {
-		c.FlushData()
+func FormatData(record interface{}) []string {
+	switch v := record.(type) {
+	case TickerDataStruct:
+		return []string{
+			strconv.FormatInt(int64(v.TimeStamp), 10),
+			strconv.FormatInt(int64(v.Date), 10),
+			v.Symbol,
+			strconv.FormatFloat(float64(v.BidPrice), 'f', -5, 32),
+			strconv.FormatFloat(float64(v.BidSize), 'f', -2, 32),
+			strconv.FormatFloat(float64(v.AskPrice), 'f', -5, 32),
+			strconv.FormatFloat(float64(v.AskSize), 'f', -2, 32),
+		}
+	case TradeDataStruct:
+		return []string{
+			strconv.FormatInt(int64(v.TimeStamp), 10),
+			strconv.FormatInt(int64(v.Date), 10),
+			v.Symbol,
+			strconv.FormatFloat(float64(v.Price), 'f', -5, 32),
+			strconv.FormatFloat(float64(v.Quantity), 'f', -2, 32),
+			strconv.FormatBool(v.Bid_MM),
+		}
+	default:
+		return nil
 	}
 }
 
-func (c *TradeDataBuffer) AddData(record []TradeDataStruct) {
-	c.buffer = append(c.buffer, record)
-	if len(c.buffer) >= c.maxSize {
-		c.FlushData()
-	}
-}
-
-// Method to save the buffer to a CSV file.
-
-func (c *TickerDataBuffer) FlushData() error {
-	// Check if the file exists and is empty.
-	fileInfo, err := os.Stat(c.fileName)
-	isEmpty := os.IsNotExist(err) || (err == nil && fileInfo.Size() == 0)
-	if err != nil && !os.IsNotExist(err) {
-		return fmt.Errorf("error checking file: %w", err)
-	}
-
-	// Open or create the CSV file for appending.
+func (c *DataBuffer) FlushData() error {
 	file, err := os.OpenFile(c.fileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return fmt.Errorf("error opening file: %w", err)
 	}
 	defer file.Close()
 
-	// Create a CSV writer.
+	isEmpty := fileIsEmpty(c.fileName)
 	writer := csv.NewWriter(file)
 	defer writer.Flush()
 
-	// Write the header if the file is empty.
+	// Write header if file is empty
 	if isEmpty {
 		header := []string{"TimeStamp", "Date", "Symbol", "BidPrice", "BidSize", "AskPrice", "AskSize"}
+		if c.dataType == "trade" {
+			header = []string{"TimeStamp", "Date", "Symbol", "Price", "Quantity", "Bid_MM"}
+		}
 		if err := writer.Write(header); err != nil {
 			return fmt.Errorf("error writing CSV header: %w", err)
 		}
 	}
 
-	// Write data from buffer to CSV.
-	for _, batch := range c.buffer {
-		for _, record := range batch {
-			stringRecord := []string{
-				strconv.Itoa(int(record.TimeStamp)),
-				strconv.Itoa(int(record.Date)),
-				record.Symbol,
-				strconv.FormatFloat(float64(record.BidPrice), 'f', 4, 32),
-				strconv.FormatFloat(float64(record.BidSize), 'f', 4, 32),
-				strconv.FormatFloat(float64(record.AskPrice), 'f', 4, 32),
-				strconv.FormatFloat(float64(record.AskSize), 'f', 4, 32),
-			}
-			if err := writer.Write(stringRecord); err != nil {
-				return fmt.Errorf("error writing record to CSV: %w", err)
+	// Write buffer data
+	if c.dataType == "ticker" {
+		for _, batch := range c.tickerBuffer {
+			for _, record := range batch {
+				if err := writer.Write(FormatData(record)); err != nil {
+					return fmt.Errorf("error writing record to CSV: %w", err)
+				}
 			}
 		}
+		c.tickerBuffer = make([][]TickerDataStruct, 0) // Reset efficiently
+	} else if c.dataType == "trade" {
+		for _, batch := range c.tradeBuffer {
+			for _, record := range batch {
+				if err := writer.Write(FormatData(record)); err != nil {
+					return fmt.Errorf("error writing record to CSV: %w", err)
+				}
+			}
+		}
+		c.tradeBuffer = make([][]TradeDataStruct, 0) // Reset efficiently
+	} else {
+		return fmt.Errorf("unsupported data type")
 	}
-
-	// Reset buffer efficiently.
-	c.buffer = nil
 
 	return nil
 }
 
-func (c *TradeDataBuffer) FlushData() error {
-	// Check if the file exists and is empty.
-	fileInfo, err := os.Stat(c.fileName)
-	isEmpty := os.IsNotExist(err) || (err == nil && fileInfo.Size() == 0)
-	if err != nil && !os.IsNotExist(err) {
-		return fmt.Errorf("error checking file: %w", err)
-	}
-
-	// Open or create the CSV file for appending.
-	file, err := os.OpenFile(c.fileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	if err != nil {
-		return fmt.Errorf("error opening file: %w", err)
-	}
-	defer file.Close()
-
-	// Create a CSV writer.
-	writer := csv.NewWriter(file)
-	defer writer.Flush()
-
-	// Write the header if the file is empty.
-	if isEmpty {
-		header := []string{"TimeStamp", "Date", "Symbol", "Price", "Quantity", "Bid_MM"}
-		if err := writer.Write(header); err != nil {
-			return fmt.Errorf("error writing CSV header: %w", err)
-		}
-	}
-
-	// Write data from buffer to CSV.
-	for _, batch := range c.buffer {
-		for _, record := range batch {
-			stringRecord := []string{
-				strconv.Itoa(int(record.TimeStamp)),
-				strconv.Itoa(int(record.Date)),
-				record.Symbol,
-				strconv.FormatFloat(float64(record.Price), 'f', 4, 32),    // Fixed precision
-				strconv.FormatFloat(float64(record.Quantity), 'f', 4, 32), // Fixed precision
-				strconv.FormatBool(record.Bid_MM),
-			}
-			if err := writer.Write(stringRecord); err != nil {
-				return fmt.Errorf("error writing record to CSV: %w", err)
-			}
-		}
-	}
-
-	// Reset buffer efficiently.
-	c.buffer = nil
-
-	return nil
+// Helper function to check if file is empty
+func fileIsEmpty(filename string) bool {
+	fileInfo, err := os.Stat(filename)
+	return os.IsNotExist(err) || (err == nil && fileInfo.Size() == 0)
 }
 
 // Create a new buffer
-
-func NewTickerCSVBuffer(maxSize int, fileName string) *TickerDataBuffer {
-	return &TickerDataBuffer{
-		buffer:   make([][]TickerDataStruct, 0),
-		maxSize:  maxSize,
-		fileName: fileName,
-	}
-}
-
-func NewTradeCSVBuffer(maxSize int, fileName string) *TradeDataBuffer {
-	return &TradeDataBuffer{
-		buffer:   make([][]TradeDataStruct, 0),
-		maxSize:  maxSize,
-		fileName: fileName,
+func NewDataBuffer(dataType string, dataStream string, maxSize int, fileName string) *DataBuffer {
+	return &DataBuffer{
+		tickerBuffer: make([][]TickerDataStruct, 0),
+		tradeBuffer:  make([][]TradeDataStruct, 0),
+		dataType:     dataType,
+		dataStream:   dataStream,
+		maxSize:      maxSize,
+		fileName:     fileName,
 	}
 }

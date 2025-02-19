@@ -10,9 +10,6 @@ import (
 	"syscall"
 
 	"github.com/Antkky/go_crypto_scraper/handlers/binance"
-	"github.com/Antkky/go_crypto_scraper/handlers/bitfinex"
-	"github.com/Antkky/go_crypto_scraper/handlers/bybit"
-	"github.com/Antkky/go_crypto_scraper/handlers/coinex"
 	"github.com/Antkky/go_crypto_scraper/utils"
 	"github.com/gorilla/websocket"
 )
@@ -44,15 +41,25 @@ func establishConnections(configs []utils.ExchangeConfig) ([]*websocket.Conn, er
 		if err != nil || conn == nil {
 			logger.Printf("❌ Error connecting to exchange %s: %s", config.Name, err)
 			continue
+		} else {
+			logger.Printf("✅ Connection established for %s", config.Name)
+			connections = append(connections, conn)
+
+			// subscribe to the streams
+			for _, stream := range config.Streams {
+				streamData, err := json.Marshal(stream)
+				if err != nil {
+					logger.Printf("❌ Error marshaling stream %s: %s", stream, err)
+					continue
+				}
+				if err := conn.WriteMessage(websocket.TextMessage, streamData); err != nil {
+					logger.Printf("❌ Error subscribing to stream %s: %s", stream, err)
+				}
+			}
+
+			// Handle connection in separate goroutines based on exchange
+			go handleExchangeConnection(config, conn)
 		}
-
-		logger.Printf("✅ Connection established for %s", config.Name)
-		connections = append(connections, conn)
-
-    
-		// Handle connection in separate goroutines based on exchange
-		go handleExchangeConnection(config, conn)
-
 	}
 
 	return connections, nil
@@ -62,13 +69,13 @@ func establishConnections(configs []utils.ExchangeConfig) ([]*websocket.Conn, er
 func handleExchangeConnection(config utils.ExchangeConfig, conn *websocket.Conn) {
 	switch {
 	case strings.Contains(config.Name, "Binance"):
-		binance.HandleConnection(conn, config)
+		binance.HandleConnection(conn, config, utils.DataBuffer{}) // fix this
 	case strings.Contains(config.Name, "Coinex"):
-		coinex.HandleConnection(conn, config)
+		//coinex.HandleConnection(conn, config)
 	case strings.Contains(config.Name, "Bybit"):
-		bybit.HandleConnection(conn, config)
+		//bybit.HandleConnection(conn, config)
 	case strings.Contains(config.Name, "Bitfinex"):
-		bitfinex.HandleConnection(conn, config)
+		//bitfinex.HandleConnection(conn, config)
 	default:
 		logger.Printf("⚠️ Unhandled exchange: %s", config.Name)
 	}

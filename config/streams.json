@@ -4,14 +4,40 @@
     "uri": "wss://stream.binance.us:9443/ws",
     "streams": [
       {
-        "method": "SUBSCRIBE",
-        "params": [
-          "btcusdt@trade",
-          "btcusdt@ticker",
-          "ethusdt@trade",
-          "ethusdt@ticker"
-        ],
-        "id": 1
+        "type": "ticker",
+        "symbol": "BTCUSD",
+        "market": "spot",
+        "message": {
+          "method": "SUBSCRIBE",
+          "params": ["btcusdt@ticker"]
+        }
+      },
+      {
+        "type": "trade",
+        "symbol": "BTCUSD",
+        "market": "spot",
+        "message": {
+          "method": "SUBSCRIBE",
+          "params": ["btcusdt@trade"]
+        }
+      },
+      {
+        "type": "ticker",
+        "symbol": "ETHUSD",
+        "market": "spot",
+        "message": {
+          "method": "SUBSCRIBE",
+          "params": ["ethusdt@ticker"]
+        }
+      },
+      {
+        "type": "trade",
+        "symbol": "ETHUSD",
+        "market": "spot",
+        "message": {
+          "method": "SUBSCRIBE",
+          "params": ["ethusdt@trade"]
+        }
       }
     ]
   },
@@ -20,14 +46,40 @@
     "uri": "wss://data-stream.binance.vision/stream",
     "streams": [
       {
-        "method": "SUBSCRIBE",
-        "params": [
-          "btcusdt@trade",
-          "btcusdt@ticker",
-          "ethusdt@trade",
-          "ethusdt@ticker"
-        ],
-        "id": 1
+        "type": "ticker",
+        "symbol": "BTCUSD",
+        "market": "spot",
+        "message": {
+          "method": "SUBSCRIBE",
+          "params": ["btcusdt@ticker"]
+        }
+      },
+      {
+        "type": "trade",
+        "symbol": "BTCUSD",
+        "market": "spot",
+        "message": {
+          "method": "SUBSCRIBE",
+          "params": ["btcusdt@trade"]
+        }
+      },
+      {
+        "type": "ticker",
+        "symbol": "ETHUSD",
+        "market": "spot",
+        "message": {
+          "method": "SUBSCRIBE",
+          "params": ["ethusdt@ticker"]
+        }
+      },
+      {
+        "type": "trade",
+        "symbol": "ETHUSD",
+        "market": "spot",
+        "message": {
+          "method": "SUBSCRIBE",
+          "params": ["ethusdt@trade"]
+        }
       }
     ]
   },
