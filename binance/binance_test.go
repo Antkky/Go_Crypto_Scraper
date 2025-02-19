@@ -229,7 +229,12 @@ var ProcessMessageTypeTestCases = []struct {
 func TestProcessMessageType(t *testing.T) {
 	for _, tt := range ProcessMessageTypeTestCases {
 		t.Run(tt.name, func(t *testing.T) {
-			r1, r2, err := ProcessMessageType(tt.eventType, tt.message, tt.wrapped)
+			var (
+				r1 structs.TickerData
+				r2 structs.TradeData
+			)
+
+			err := ProcessMessageType(tt.message, &r1, &r2)
 
 			// error test
 			if assert.Error(t, err, "An error has occurred") {
@@ -293,7 +298,8 @@ func TestHandleTickerMessage(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		r1, err := HandleTickerMessage(tt.message, tt.wrapped)
+		var r1 structs.TickerData
+		err := HandleTickerMessage(tt.message, &r1)
 
 		// error test
 		if tt.wantError {
@@ -325,7 +331,8 @@ func TestHandleTradeMessage(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		r1, err := HandleTradeMessage(tt.message, tt.wrapped)
+		var r1 structs.TradeData
+		err := HandleTradeMessage(tt.message, &r1)
 
 		// error test
 		if tt.wantError {

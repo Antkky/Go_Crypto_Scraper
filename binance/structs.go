@@ -6,8 +6,11 @@ type MessageCheck struct {
 
 // wrapped
 type GlobalMessageStruct struct {
-	Stream string          `json:"stream"`
-	Data   USMessageStruct `json:"data"`
+	Stream    string          `json:"stream"`
+	Data      USMessageStruct `json:"data"`
+	EventType string          `json:"e"`
+	EventTime int64           `json:"E"`
+	Symbol    string          `json:"s"`
 }
 
 // unwrapped
