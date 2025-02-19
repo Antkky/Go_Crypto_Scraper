@@ -13,22 +13,6 @@ import (
 )
 
 
-
-//___________Table Of Contents______________
-// func HandleConnection : line - 32
-// func ParseStreams : line - 78
-// func Subscribe : line - 87
-// func ConsumeMessages : line - 124
-// func ReceiveMessages : line - 147
-// func ProcessMessageType : line - 179
-// func HandleTickerMessage : line - 212
-// func HandleTradeMessage : line - 231
-// func HandleMessage : line - 249
-// func CloseConnection : line - 276
-
-
-
-
 // HandleConnection()
 //
 // Inputs:
@@ -201,50 +185,18 @@ func ProcessMessageType(message []byte, tickerData *utils.TickerDataStruct, trad
 
 	switch eventType {
 	case "24hrTicker":
-		return HandleTickerMessage(message, tickerData)
+    if err := json.Unmarshal(message, tickerData); err != nil {
+      return err
+    }
 	case "trade":
-		return HandleTradeMessage(message, tradeData)
+    if err := json.Unmarshal(message, tradeData); err != nil {
+      return err
+    }
 	default:
 		return errors.New("unhandled event type: " + eventType)
 	}
 }
 
-// HandleTickerMessage()
-//
-// Inputs:
-//  message   : []byte
-//  tradeData : *utils.TradeDataStruct
-//
-// Outputs:
-//  error
-//
-// Description:
-//  processes the ticker data inside the byte array and push the data to the pointer tradeData
-//
-func HandleTickerMessage(message []byte, tickerData *utils.TickerDataStruct) error {
-	// Add logic here to handle ticker message
-	// e.g., Unmarshal and process the data, based on whether it's wrapped or not
-	return nil
-}
-
-
-// HandleTradeMessage()
-//
-// Inputs:
-//  message   : []byte
-//  tradeData : *utils.TradeDataStruct
-//
-// Outputs:
-//  error
-//
-// Description:
-//  processes the trade data inside the byte array
-//
-func HandleTradeMessage(message []byte, tradeData *utils.TradeDataStruct) error {
-	// Add logic here to handle trade message
-	// e.g., Unmarshal and process the data, based on whether it's wrapped or not
-	return nil
-}
 
 // HandleMessage()
 //
@@ -268,7 +220,11 @@ func HandleMessage(message []byte, exchange utils.ExchangeConfig) error {
 		return err
 	}
 
-  // implement saving logic
+  if tickerData != nil {
+    // save ticker data
+  } else if tradeData != nil {
+    // save trade data
+  }
 
 	return nil
 }

@@ -41,20 +41,18 @@ func establishConnections(configs []utils.ExchangeConfig) ([]*websocket.Conn, er
 
 	for _, config := range configs {
 		conn, _, err := websocket.DefaultDialer.Dial(config.URI, nil)
-		if err != nil {
+		if err != nil || conn == nil {
 			logger.Printf("❌ Error connecting to exchange %s: %s", config.Name, err)
-			continue
-		}
-		if conn == nil {
-			logger.Printf("⚠️ Connection for exchange %s is nil.", config.Name)
 			continue
 		}
 
 		logger.Printf("✅ Connection established for %s", config.Name)
 		connections = append(connections, conn)
 
+    
 		// Handle connection in separate goroutines based on exchange
 		go handleExchangeConnection(config, conn)
+
 	}
 
 	return connections, nil

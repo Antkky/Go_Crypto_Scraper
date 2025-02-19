@@ -15,9 +15,9 @@
               "state": {
                 "file": "Process Flow Chart.canvas",
                 "viewState": {
-                  "x": 1064.4192426742609,
-                  "y": 1000.9994242314825,
-                  "zoom": -1.6666666666666665
+                  "x": 1704.7677016842194,
+                  "y": 241.38400164498313,
+                  "zoom": -2.475719665464909
                 }
               },
               "icon": "lucide-layout-dashboard",
@@ -171,17 +171,20 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "ab0e27ca59e875b0",
+  "active": "00f56580d941d6c3",
   "lastOpenFiles": [
+    "utils/save.go~",
+    "handlers/binance/binance.go~",
+    "main.go~",
+    "main.md",
     "Data File Structure.canvas",
-    "Handle Message.md",
     "Process Flow Chart.canvas",
+    "Handle Connection.md",
+    "Handle Message.md",
     "Handle Message 1.md",
     "Unit Tests.md",
-    "Handle Connection.md",
     "structs/structs.go",
     "structs",
-    "main.md",
     "obsidian_images/EstablishConnections 1.png",
     "obsidian_images/OpenParseJSON 1.png",
     "main_revised.go",
@@ -195,8 +198,6 @@
     "bybit/bybit_test.go",
     "bybit/structs.go",
     "bitfinex/bitfinex_test.go",
-    "bitfinex/structs.go",
-    "bitfinex/save.go",
     "obsidian_images/closeConnections.png",
     "obsidian_images/shutdownChannel.png",
     "obsidian_images/LuhDefer.png",

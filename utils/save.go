@@ -12,12 +12,16 @@ import (
 type TickerDataBuffer struct {
 	buffer   [][]TickerDataStruct
 	maxSize  int
+  dataStream string
+  filePath string
 	fileName string
 }
 
 type TradeDataBuffer struct {
 	buffer   [][]TradeDataStruct
 	maxSize  int
+  dataStream
+  filePath
 	fileName string
 }
 
