@@ -7,24 +7,6 @@ import (
 	"strconv"
 )
 
-// Buffer Structs
-
-type TickerDataBuffer struct {
-	buffer   [][]TickerDataStruct
-	maxSize  int
-  dataStream string
-  filePath string
-	fileName string
-}
-
-type TradeDataBuffer struct {
-	buffer   [][]TradeDataStruct
-	maxSize  int
-  dataStream
-  filePath
-	fileName string
-}
-
 // Method to add data to the buffer
 
 func (c *TickerDataBuffer) AddData(record []TickerDataStruct) {

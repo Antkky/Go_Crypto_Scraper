@@ -15,7 +15,6 @@ import (
 // func TestHandleTickerMessage()   : line-317
 // func TestHandleTradeMessage()    : line-364
 
-
 // Test Cases for ProcessMessageType
 var ProcessMessageTypeTestCases = []struct {
 	name       string
@@ -233,7 +232,7 @@ var ProcessMessageTypeTestCases = []struct {
 	},
 }
 
-//TestProcessMessageType
+// TestProcessMessageType
 //
 // inputs
 // message : []byte
@@ -286,7 +285,7 @@ var HandleMessageTestCases = []struct {
 	{},
 }
 
-//TestHandleMessage
+// TestHandleMessage
 //
 // inputs
 // message : []byte

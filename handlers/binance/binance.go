@@ -12,36 +12,37 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-
 // HandleConnection()
 //
 // Inputs:
-//  conn     : *websocket.Conn
-//  exchange : utils.ExchangeConfig
+//
+//	conn     : *websocket.Conn
+//	exchange : utils.ExchangeConfig
 //
 // Outputs:
-//  No Outputs
+//
+//	No Outputs
 //
 // Description:
-//  goroutine that subscribes and launches 2 goroutines to listen for messages and handle them
 //
+//	goroutine that subscribes and launches 2 goroutines to listen for messages and handle them
 func HandleConnection(conn *websocket.Conn, exchange utils.ExchangeConfig) {
 	if conn == nil {
 		log.Println("Connection is nil, exiting HandleConnection.")
 		return
 	}
 
-	streams, err := parseStreams(exchange.Streams)
+	streams, err := ParseStreams(exchange.Streams)
 	if err != nil {
 		log.Printf("Failed to parse streams for %s: %s", exchange.Name, err)
 		return
 	}
 
-  for _, stream := range streams {
-    if err := Subscribe(conn, stream, exchange.Name); err != nil {
-      log.Printf("Error subscribing to stream for %s: %s", exchange.name, err)
-    }
-  }
+	for _, stream := range streams {
+		if err := Subscribe(conn, stream, exchange.Name); err != nil {
+			log.Printf("Error subscribing to stream for %s: %s", exchange.Name, err)
+		}
+	}
 
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
@@ -56,21 +57,23 @@ func HandleConnection(conn *websocket.Conn, exchange utils.ExchangeConfig) {
 	<-interrupt
 	log.Println("Interrupt received, closing connection...")
 
-	closeConnection(conn, exchange.Name)
+	CloseConnection(conn, exchange.Name)
 }
 
 // ParseStreams()
 //
 // Inputs:
-//  streamsData : json.RawMessage
+//
+//	streamsData : json.RawMessage
 //
 // Outputs:
-//  []map[string]interface{}
-//  error
+//
+//	[]map[string]interface{}
+//	error
 //
 // Description:
-//  turns the streamsData into a data type we can iterate over
 //
+//	turns the streamsData into a data type we can iterate over
 func ParseStreams(streamsData json.RawMessage) ([]map[string]interface{}, error) {
 	var streams []map[string]interface{}
 	if err := json.Unmarshal(streamsData, &streams); err != nil {
@@ -79,20 +82,21 @@ func ParseStreams(streamsData json.RawMessage) ([]map[string]interface{}, error)
 	return streams, nil
 }
 
-
 // Subscribe()
 //
 // Inputs:
-//  conn         : *websocket.Conn
-//  stream       : map[string]interface{}
-//  exchangeName : string
+//
+//	conn         : *websocket.Conn
+//	stream       : map[string]interface{}
+//	exchangeName : string
 //
 // Outputs:
-//  error
+//
+//	error
 //
 // Description:
-//  sends a subscribe message to the server
 //
+//	sends a subscribe message to the server
 func Subscribe(conn *websocket.Conn, stream map[string]interface{}, exchangeName string) error {
 	message, err := json.Marshal(stream)
 	if err != nil {
@@ -104,20 +108,21 @@ func Subscribe(conn *websocket.Conn, stream map[string]interface{}, exchangeName
 	return nil
 }
 
-
 // ConsumeMessages()
 //
 // Inputs:
-//  messageQueue  : chan []byte
-//  done         : chan struct{}
-//  exchange     : utils.ExchangeConfig
+//
+//	messageQueue  : chan []byte
+//	done         : chan struct{}
+//	exchange     : utils.ExchangeConfig
 //
 // Outputs:
-//  No Outputs
+//
+//	No Outputs
 //
 // Description:
-//  invoke the HandleMessage() function to process the message in the messageQueue
 //
+//	invoke the HandleMessage() function to process the message in the messageQueue
 func ConsumeMessages(messageQueue chan []byte, done chan struct{}, exchange utils.ExchangeConfig) {
 	defer close(done)
 	for message := range messageQueue {
@@ -127,21 +132,22 @@ func ConsumeMessages(messageQueue chan []byte, done chan struct{}, exchange util
 	}
 }
 
-
 // ReceiveMessages()
 //
 // Inputs:
-//  message      : *websocket.Conn
-//  messageQueue : chan []byte,
-//  done         : chan struct{},
-//  exchange     : utils.ExchangeConfig
+//
+//	message      : *websocket.Conn
+//	messageQueue : chan []byte,
+//	done         : chan struct{},
+//	exchange     : utils.ExchangeConfig
 //
 // Outputs:
-//  No Outputs
+//
+//	No Outputs
 //
 // Description:
-//  sends received messages to the messageQueue channel
 //
+//	sends received messages to the messageQueue channel
 func ReceiveMessages(conn *websocket.Conn, messageQueue chan []byte, done chan struct{}, exchange utils.ExchangeConfig) {
 	defer close(done)
 	for {
@@ -159,20 +165,21 @@ func ReceiveMessages(conn *websocket.Conn, messageQueue chan []byte, done chan s
 	}
 }
 
-
 // ProcessMessageType()
 //
 // Inputs:
-//  message    : []byte
-//  tickerData : *utils.TickerDataStruct
-//  tradeData  : *utils.TradeDataStruct
+//
+//	message    : []byte
+//	tickerData : *utils.TickerDataStruct
+//	tradeData  : *utils.TradeDataStruct
 //
 // Outputs:
-//  error
+//
+//	error
 //
 // Description:
-//  basically routes the data to the correct processing function
 //
+//	basically routes the data to the correct processing function
 func ProcessMessageType(message []byte, tickerData *utils.TickerDataStruct, tradeData *utils.TradeDataStruct) error {
 	var pMessage GlobalMessageStruct
 	var eventType string
@@ -185,31 +192,34 @@ func ProcessMessageType(message []byte, tickerData *utils.TickerDataStruct, trad
 
 	switch eventType {
 	case "24hrTicker":
-    if err := json.Unmarshal(message, tickerData); err != nil {
-      return err
-    }
+		if err := json.Unmarshal(message, tickerData); err != nil {
+			return err
+		}
+		return nil
 	case "trade":
-    if err := json.Unmarshal(message, tradeData); err != nil {
-      return err
-    }
+		if err := json.Unmarshal(message, tradeData); err != nil {
+			return err
+		}
+		return nil
 	default:
 		return errors.New("unhandled event type: " + eventType)
 	}
 }
 
-
 // HandleMessage()
 //
 // Inputs:
-//  message  : []byte
-//  exchange : utils.ExchangeConfig
+//
+//	message  : []byte
+//	exchange : utils.ExchangeConfig
 //
 // Outputs:
-//  error
+//
+//	error
 //
 // Description:
-//  handle processing and saving the message
 //
+//	handle processing and saving the message
 func HandleMessage(message []byte, exchange utils.ExchangeConfig) error {
 	var (
 		tickerData utils.TickerDataStruct
@@ -220,11 +230,11 @@ func HandleMessage(message []byte, exchange utils.ExchangeConfig) error {
 		return err
 	}
 
-  if tickerData != nil {
-    // save ticker data
-  } else if tradeData != nil {
-    // save trade data
-  }
+	if tickerData != nil {
+		// save ticker data
+	} else if tradeData != nil {
+		// save trade data
+	}
 
 	return nil
 }
@@ -232,15 +242,17 @@ func HandleMessage(message []byte, exchange utils.ExchangeConfig) error {
 // CloseConnection()
 //
 // Inputs:
-//  conn         : *websocket.conn
-//  exchangeName : string
+//
+//	conn         : *websocket.conn
+//	exchangeName : string
 //
 // Outputs:
-//  No Outputs
+//
+//	No Outputs
 //
 // Description:
-//  Gracefully close the connection by sending a closure message and gracefully close connection
 //
+//	Gracefully close the connection by sending a closure message and gracefully close connection
 func CloseConnection(conn *websocket.Conn, exchangeName string) {
 	closeMsg := websocket.FormatCloseMessage(websocket.CloseNormalClosure, "Normal closure")
 	if err := conn.WriteMessage(websocket.CloseMessage, closeMsg); err != nil {

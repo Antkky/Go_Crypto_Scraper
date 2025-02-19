@@ -20,6 +20,14 @@ type TickerDataStruct struct {
 	AskSize   float32
 }
 
+type TickerDataBuffer struct {
+	buffer     [][]TickerDataStruct
+	maxSize    int
+	dataStream string
+	filePath   string
+	fileName   string
+}
+
 type TradeDataStruct struct {
 	TimeStamp uint
 	Date      uint
@@ -27,4 +35,12 @@ type TradeDataStruct struct {
 	Price     float32
 	Quantity  float32
 	Bid_MM    bool
+}
+
+type TradeDataBuffer struct {
+	buffer     [][]TradeDataStruct
+	maxSize    int
+	dataStream string
+	filePath   string
+	fileName   string
 }
