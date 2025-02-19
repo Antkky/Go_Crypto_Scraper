@@ -101,7 +101,6 @@ func ReceiveMessages(conn *websocket.Conn, messageQueue chan []byte, done chan s
 	}
 }
 
-// ProcessMessageType processes incoming messages based on event type.
 func ProcessMessageType(message []byte, tickerData *structs.TickerData, tradeData *structs.TradeData) error {
 	var pMessage GlobalMessageStruct
 	var eventType string
@@ -134,7 +133,6 @@ func HandleTradeMessage(message []byte, tradeData *structs.TradeData) error {
 	return nil
 }
 
-// HandleMessage processes each message according to its type and passes the data to the appropriate handler.
 func HandleMessage(message []byte, exchange structs.ExchangeConfig) error {
 	var (
 		tickerData structs.TickerData
@@ -145,12 +143,9 @@ func HandleMessage(message []byte, exchange structs.ExchangeConfig) error {
 		return err
 	}
 
-	// Process the data (e.g., log, store, or trigger further actions)
-	// Placeholder for data processing logic
 	return nil
 }
 
-// closeConnection shuts down the WebSocket connection gracefully.
 func closeConnection(conn *websocket.Conn, exchangeName string) {
 	closeMsg := websocket.FormatCloseMessage(websocket.CloseNormalClosure, "Normal closure")
 	if err := conn.WriteMessage(websocket.CloseMessage, closeMsg); err != nil {
