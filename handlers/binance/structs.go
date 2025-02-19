@@ -1,20 +1,14 @@
 package binance
 
-type MessageCheck struct {
-	Stream string `json:"stream"`
-}
 
-// wrapped
+// Global Message Struct
 type GlobalMessageStruct struct {
-	Stream    string          `json:"stream"`
-	Data      USMessageStruct `json:"data"`
-	EventType string          `json:"e"`
-	EventTime int64           `json:"E"`
-	Symbol    string          `json:"s"`
-}
-
-// unwrapped
-type USMessageStruct struct {
+  Stream    string `json:"stream"`
+	Data      struct{
+    EventType string `json:"e"`
+    EventTime int64  `json:"E"`
+    Symbol    string `json:"s"`
+  } `json:"data"`
 	EventType string `json:"e"`
 	EventTime int64  `json:"E"`
 	Symbol    string `json:"s"`
@@ -33,7 +27,7 @@ type TickerData struct {
 }
 
 type TradeData struct {
-	EventType string `json:"e"`
+  EventType string `json:"e"`
 	EventTime int64  `json:"E"`
 	Symbol    string `json:"s"`
 	TradeID   int    `json:"t"`

@@ -7,9 +7,16 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// _____________Main Stuff_____________
+// _____________Table of Contents______________
+// var  ProcessMessageTypeTestCases : line-019
+// func TestProcessMessageType()    : line-236
+// var  HandleMessageTestCases      : line-269
+// func TestHandleMessage()         : line-289
+// func TestHandleTickerMessage()   : line-317
+// func TestHandleTradeMessage()    : line-364
 
-// ProcessMessageType
+
+// Test Cases for ProcessMessageType
 var ProcessMessageTypeTestCases = []struct {
 	name       string
 	eventType  string
@@ -226,6 +233,18 @@ var ProcessMessageTypeTestCases = []struct {
 	},
 }
 
+//TestProcessMessageType
+//
+// inputs
+// message : []byte
+// r1      : *utils.TickerDataStruct
+// r2      : *utils.TradeDataStruct
+//
+// Outputs:
+// err : error
+//
+// Description:
+// routes message for processing changes through pointer reference
 func TestProcessMessageType(t *testing.T) {
 	for _, tt := range ProcessMessageTypeTestCases {
 		t.Run(tt.name, func(t *testing.T) {
@@ -256,7 +275,7 @@ func TestProcessMessageType(t *testing.T) {
 	}
 }
 
-// HandleMessage
+// Test Cases for HandleMessage
 var HandleMessageTestCases = []struct {
 	name       string
 	message    []byte
@@ -267,6 +286,18 @@ var HandleMessageTestCases = []struct {
 	{},
 }
 
+//TestHandleMessage
+//
+// inputs
+// message : []byte
+// exchange      : *utils.ExchangeConfig
+//
+// Outputs:
+// err : error
+//
+// Description:
+// routes message for processing
+// based on type of message
 func TestHandleMessage(t *testing.T) {
 	for _, tt := range HandleMessageTestCases {
 		t.Run(tt.name, func(t *testing.T) {
@@ -283,7 +314,18 @@ func TestHandleMessage(t *testing.T) {
 	}
 }
 
-// _____________Ticker & Trade Handlers_____________
+//TestHandleTickerMessage
+//
+// inputs:
+// message : []byte
+// r1      : *struct.TickerDataStruct
+//
+// Outputs: 
+// err : error
+//
+// Description:
+// Converts a known ticker byte array message into
+// a stanardized data format for later processing
 func TestHandleTickerMessage(t *testing.T) {
 	tests := []struct {
 		name       string
@@ -305,7 +347,8 @@ func TestHandleTickerMessage(t *testing.T) {
 		if tt.wantError {
 			if !assert.Error(t, err) && !assert.Equal(t, tt.errorValue, err) {
 				t.Error("Unexpected error")
-			}
+
+      }
 		} else {
 			if assert.Error(t, err) {
 				t.Error("Unexpected error")
@@ -317,6 +360,19 @@ func TestHandleTickerMessage(t *testing.T) {
 		}
 	}
 }
+
+// TestHandleTradeMessage
+//
+// inputs:
+// message : []byte
+// r1      : *utils.TradeDataStruct
+//
+// Outputs: 
+// err : error
+//
+// Description:
+// Converts a known trade byte array message into
+// a stanardized data format for later processing
 func TestHandleTradeMessage(t *testing.T) {
 	tests := []struct {
 		name       string

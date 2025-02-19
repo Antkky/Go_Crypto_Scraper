@@ -12,7 +12,35 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-// HandleConnection manages the lifecycle of a WebSocket connection to Binance.
+
+
+//___________Table Of Contents______________
+// func HandleConnection : line - 32
+// func ParseStreams : line - 78
+// func Subscribe : line - 87
+// func ConsumeMessages : line - 124
+// func ReceiveMessages : line - 147
+// func ProcessMessageType : line - 179
+// func HandleTickerMessage : line - 212
+// func HandleTradeMessage : line - 231
+// func HandleMessage : line - 249
+// func CloseConnection : line - 276
+
+
+
+
+// HandleConnection()
+//
+// Inputs:
+//  conn     : *websocket.Conn
+//  exchange : utils.ExchangeConfig
+//
+// Outputs:
+//  No Outputs
+//
+// Description:
+//  goroutine that subscribes and launches 2 goroutines to listen for messages and handle them
+//
 func HandleConnection(conn *websocket.Conn, exchange utils.ExchangeConfig) {
 	if conn == nil {
 		log.Println("Connection is nil, exiting HandleConnection.")
@@ -25,10 +53,12 @@ func HandleConnection(conn *websocket.Conn, exchange utils.ExchangeConfig) {
 		return
 	}
 
-	// Subscribe to the streams
-	subscribeToStreams(conn, streams, exchange.Name)
+  for _, stream := range streams {
+    if err := Subscribe(conn, stream, exchange.Name); err != nil {
+      log.Printf("Error subscribing to stream for %s: %s", exchange.name, err)
+    }
+  }
 
-	// Setup graceful shutdown
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
 	defer signal.Stop(interrupt)
@@ -36,19 +66,28 @@ func HandleConnection(conn *websocket.Conn, exchange utils.ExchangeConfig) {
 	messageQueue := make(chan []byte, 100)
 	done := make(chan struct{})
 
-	// Concurrent message handling
 	go ConsumeMessages(messageQueue, done, exchange)
 	go ReceiveMessages(conn, messageQueue, done, exchange)
 
-	// Wait for interrupt
 	<-interrupt
 	log.Println("Interrupt received, closing connection...")
 
-	// Cleanly close connection
 	closeConnection(conn, exchange.Name)
 }
 
-func parseStreams(streamsData json.RawMessage) ([]map[string]interface{}, error) {
+// ParseStreams()
+//
+// Inputs:
+//  streamsData : json.RawMessage
+//
+// Outputs:
+//  []map[string]interface{}
+//  error
+//
+// Description:
+//  turns the streamsData into a data type we can iterate over
+//
+func ParseStreams(streamsData json.RawMessage) ([]map[string]interface{}, error) {
 	var streams []map[string]interface{}
 	if err := json.Unmarshal(streamsData, &streams); err != nil {
 		return nil, err
@@ -56,14 +95,20 @@ func parseStreams(streamsData json.RawMessage) ([]map[string]interface{}, error)
 	return streams, nil
 }
 
-func subscribeToStreams(conn *websocket.Conn, streams []map[string]interface{}, exchangeName string) {
-	for _, stream := range streams {
-		if err := Subscribe(conn, stream, exchangeName); err != nil {
-			log.Printf("Error subscribing to stream for %s: %s", exchangeName, err)
-		}
-	}
-}
 
+// Subscribe()
+//
+// Inputs:
+//  conn         : *websocket.Conn
+//  stream       : map[string]interface{}
+//  exchangeName : string
+//
+// Outputs:
+//  error
+//
+// Description:
+//  sends a subscribe message to the server
+//
 func Subscribe(conn *websocket.Conn, stream map[string]interface{}, exchangeName string) error {
 	message, err := json.Marshal(stream)
 	if err != nil {
@@ -75,6 +120,20 @@ func Subscribe(conn *websocket.Conn, stream map[string]interface{}, exchangeName
 	return nil
 }
 
+
+// ConsumeMessages()
+//
+// Inputs:
+//  messageQueue  : chan []byte
+//  done         : chan struct{}
+//  exchange     : utils.ExchangeConfig
+//
+// Outputs:
+//  No Outputs
+//
+// Description:
+//  invoke the HandleMessage() function to process the message in the messageQueue
+//
 func ConsumeMessages(messageQueue chan []byte, done chan struct{}, exchange utils.ExchangeConfig) {
 	defer close(done)
 	for message := range messageQueue {
@@ -84,6 +143,21 @@ func ConsumeMessages(messageQueue chan []byte, done chan struct{}, exchange util
 	}
 }
 
+
+// ReceiveMessages()
+//
+// Inputs:
+//  message      : *websocket.Conn
+//  messageQueue : chan []byte,
+//  done         : chan struct{},
+//  exchange     : utils.ExchangeConfig
+//
+// Outputs:
+//  No Outputs
+//
+// Description:
+//  sends received messages to the messageQueue channel
+//
 func ReceiveMessages(conn *websocket.Conn, messageQueue chan []byte, done chan struct{}, exchange utils.ExchangeConfig) {
 	defer close(done)
 	for {
@@ -101,6 +175,20 @@ func ReceiveMessages(conn *websocket.Conn, messageQueue chan []byte, done chan s
 	}
 }
 
+
+// ProcessMessageType()
+//
+// Inputs:
+//  message    : []byte
+//  tickerData : *utils.TickerDataStruct
+//  tradeData  : *utils.TradeDataStruct
+//
+// Outputs:
+//  error
+//
+// Description:
+//  basically routes the data to the correct processing function
+//
 func ProcessMessageType(message []byte, tickerData *utils.TickerDataStruct, tradeData *utils.TradeDataStruct) error {
 	var pMessage GlobalMessageStruct
 	var eventType string
@@ -121,18 +209,55 @@ func ProcessMessageType(message []byte, tickerData *utils.TickerDataStruct, trad
 	}
 }
 
+// HandleTickerMessage()
+//
+// Inputs:
+//  message   : []byte
+//  tradeData : *utils.TradeDataStruct
+//
+// Outputs:
+//  error
+//
+// Description:
+//  processes the ticker data inside the byte array and push the data to the pointer tradeData
+//
 func HandleTickerMessage(message []byte, tickerData *utils.TickerDataStruct) error {
 	// Add logic here to handle ticker message
 	// e.g., Unmarshal and process the data, based on whether it's wrapped or not
 	return nil
 }
 
+
+// HandleTradeMessage()
+//
+// Inputs:
+//  message   : []byte
+//  tradeData : *utils.TradeDataStruct
+//
+// Outputs:
+//  error
+//
+// Description:
+//  processes the trade data inside the byte array
+//
 func HandleTradeMessage(message []byte, tradeData *utils.TradeDataStruct) error {
 	// Add logic here to handle trade message
 	// e.g., Unmarshal and process the data, based on whether it's wrapped or not
 	return nil
 }
 
+// HandleMessage()
+//
+// Inputs:
+//  message  : []byte
+//  exchange : utils.ExchangeConfig
+//
+// Outputs:
+//  error
+//
+// Description:
+//  handle processing and saving the message
+//
 func HandleMessage(message []byte, exchange utils.ExchangeConfig) error {
 	var (
 		tickerData utils.TickerDataStruct
@@ -143,16 +268,30 @@ func HandleMessage(message []byte, exchange utils.ExchangeConfig) error {
 		return err
 	}
 
+  // implement saving logic
+
 	return nil
 }
 
-func closeConnection(conn *websocket.Conn, exchangeName string) {
+// CloseConnection()
+//
+// Inputs:
+//  conn         : *websocket.conn
+//  exchangeName : string
+//
+// Outputs:
+//  No Outputs
+//
+// Description:
+//  Gracefully close the connection by sending a closure message and gracefully close connection
+//
+func CloseConnection(conn *websocket.Conn, exchangeName string) {
 	closeMsg := websocket.FormatCloseMessage(websocket.CloseNormalClosure, "Normal closure")
 	if err := conn.WriteMessage(websocket.CloseMessage, closeMsg); err != nil {
 		log.Printf("Error sending close message for %s: %v", exchangeName, err)
 	}
 
-	time.Sleep(time.Second) // Give some time for the close to be processed
+	time.Sleep(time.Second)
 
 	if err := conn.Close(); err != nil {
 		log.Printf("Error closing connection for %s: %v", exchangeName, err)
