@@ -9,11 +9,11 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/Antkky/go_crypto_scraper/binance"
-	"github.com/Antkky/go_crypto_scraper/bitfinex"
-	"github.com/Antkky/go_crypto_scraper/bybit"
-	"github.com/Antkky/go_crypto_scraper/coinex"
-	"github.com/Antkky/go_crypto_scraper/structs"
+	"github.com/Antkky/go_crypto_scraper/handlers/binance"
+	"github.com/Antkky/go_crypto_scraper/handlers/bitfinex"
+	"github.com/Antkky/go_crypto_scraper/handlers/bybit"
+	"github.com/Antkky/go_crypto_scraper/handlers/coinex"
+	"github.com/Antkky/go_crypto_scraper/utils"
 	"github.com/gorilla/websocket"
 )
 
@@ -21,13 +21,13 @@ import (
 var logger = log.New(os.Stdout, "[CryptoScraper] ", log.LstdFlags|log.Lshortfile)
 
 // readConfig reads and unmarshals the configuration file.
-func readConfig(filePath string) ([]structs.ExchangeConfig, error) {
+func readConfig(filePath string) ([]utils.ExchangeConfig, error) {
 	rawConfig, err := os.ReadFile(filePath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read config file: %w", err)
 	}
 
-	var configs []structs.ExchangeConfig
+	var configs []utils.ExchangeConfig
 	if err := json.Unmarshal(rawConfig, &configs); err != nil {
 		return nil, fmt.Errorf("failed to parse config file: %w", err)
 	}
@@ -36,7 +36,7 @@ func readConfig(filePath string) ([]structs.ExchangeConfig, error) {
 }
 
 // establishConnections creates WebSocket connections to all the exchanges.
-func establishConnections(configs []structs.ExchangeConfig) ([]*websocket.Conn, error) {
+func establishConnections(configs []utils.ExchangeConfig) ([]*websocket.Conn, error) {
 	var connections []*websocket.Conn
 
 	for _, config := range configs {
@@ -61,7 +61,7 @@ func establishConnections(configs []structs.ExchangeConfig) ([]*websocket.Conn, 
 }
 
 // handleExchangeConnection routes connection handling based on the exchange.
-func handleExchangeConnection(config structs.ExchangeConfig, conn *websocket.Conn) {
+func handleExchangeConnection(config utils.ExchangeConfig, conn *websocket.Conn) {
 	switch {
 	case strings.Contains(config.Name, "Binance"):
 		binance.HandleConnection(conn, config)

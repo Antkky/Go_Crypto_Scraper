@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/Antkky/go_crypto_scraper/structs"
+	"github.com/Antkky/go_crypto_scraper/utils"
 	"github.com/gorilla/websocket"
 )
 
@@ -33,7 +33,7 @@ func decompressGzip(data []byte) ([]byte, error) {
 	return decompressedData.Bytes(), nil
 }
 
-func HandleConnection(conn *websocket.Conn, exchange structs.ExchangeConfig) {
+func HandleConnection(conn *websocket.Conn, exchange utils.ExchangeConfig) {
 
 }
 

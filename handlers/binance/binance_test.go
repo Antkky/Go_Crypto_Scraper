@@ -3,7 +3,7 @@ package binance
 import (
 	"testing"
 
-	"github.com/Antkky/go_crypto_scraper/structs"
+	"github.com/Antkky/go_crypto_scraper/utils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -15,8 +15,8 @@ var ProcessMessageTypeTestCases = []struct {
 	eventType  string
 	message    []byte
 	wrapped    bool
-	r1         structs.TickerData
-	r2         structs.TradeData
+	r1         utils.TickerDataStruct
+	r2         utils.TradeDataStruct
 	errorValue error
 	wantError  bool
 }{
@@ -50,7 +50,7 @@ var ProcessMessageTypeTestCases = []struct {
 			"n": 18151
 		}`),
 		wrapped: false,
-		r1: structs.TickerData{
+		r1: utils.TickerDataStruct{
 			TimeStamp: 1028413123,
 			Date:      1823123,
 			Symbol:    "BTCUSDT",
@@ -59,7 +59,7 @@ var ProcessMessageTypeTestCases = []struct {
 			AskPrice:  97260.20,
 			AskSize:   42,
 		},
-		r2:         structs.TradeData{},
+		r2:         utils.TradeDataStruct{},
 		errorValue: nil,
 		wantError:  false,
 	},
@@ -97,7 +97,7 @@ var ProcessMessageTypeTestCases = []struct {
 			}
 		}`),
 		wrapped: true,
-		r1: structs.TickerData{
+		r1: utils.TickerDataStruct{
 			TimeStamp: 1028413123,
 			Date:      1823123,
 			Symbol:    "BTCUSDT",
@@ -106,7 +106,7 @@ var ProcessMessageTypeTestCases = []struct {
 			AskPrice:  97260.20,
 			AskSize:   42,
 		},
-		r2:         structs.TradeData{},
+		r2:         utils.TradeDataStruct{},
 		errorValue: nil,
 		wantError:  false,
 	},
@@ -144,7 +144,7 @@ var ProcessMessageTypeTestCases = []struct {
 			}
 		}`),
 		wrapped: false,
-		r1: structs.TickerData{
+		r1: utils.TickerDataStruct{
 			TimeStamp: 1028413123,
 			Date:      1823123,
 			Symbol:    "BTCUSDT",
@@ -153,7 +153,7 @@ var ProcessMessageTypeTestCases = []struct {
 			AskPrice:  97260.20,
 			AskSize:   42,
 		},
-		r2:         structs.TradeData{},
+		r2:         utils.TradeDataStruct{},
 		errorValue: nil,
 		wantError:  true,
 	},
@@ -191,7 +191,7 @@ var ProcessMessageTypeTestCases = []struct {
 			}
 		}`),
 		wrapped: true,
-		r1: structs.TickerData{
+		r1: utils.TickerDataStruct{
 			TimeStamp: 1028413123,
 			Date:      1823123,
 			Symbol:    "BTCUSDT",
@@ -200,7 +200,7 @@ var ProcessMessageTypeTestCases = []struct {
 			AskPrice:  97260.20,
 			AskSize:   42,
 		},
-		r2:         structs.TradeData{},
+		r2:         utils.TradeDataStruct{},
 		errorValue: nil,
 		wantError:  true,
 	},
@@ -211,7 +211,7 @@ var ProcessMessageTypeTestCases = []struct {
 		eventType: "24hrMiniTicker",
 		message:   []byte(`{invalid json}`),
 		wrapped:   false,
-		r1: structs.TickerData{
+		r1: utils.TickerDataStruct{
 			TimeStamp: 1028413123,
 			Date:      1823123,
 			Symbol:    "BTCUSDT",
@@ -220,7 +220,7 @@ var ProcessMessageTypeTestCases = []struct {
 			AskPrice:  97260.20,
 			AskSize:   42,
 		},
-		r2:         structs.TradeData{},
+		r2:         utils.TradeDataStruct{},
 		errorValue: nil,
 		wantError:  true,
 	},
@@ -230,8 +230,8 @@ func TestProcessMessageType(t *testing.T) {
 	for _, tt := range ProcessMessageTypeTestCases {
 		t.Run(tt.name, func(t *testing.T) {
 			var (
-				r1 structs.TickerData
-				r2 structs.TradeData
+				r1 utils.TickerDataStruct
+				r2 utils.TradeDataStruct
 			)
 
 			err := ProcessMessageType(tt.message, &r1, &r2)
@@ -260,7 +260,7 @@ func TestProcessMessageType(t *testing.T) {
 var HandleMessageTestCases = []struct {
 	name       string
 	message    []byte
-	exchange   structs.ExchangeConfig
+	exchange   utils.ExchangeConfig
 	errorValue error
 	wantError  bool
 }{
@@ -289,7 +289,7 @@ func TestHandleTickerMessage(t *testing.T) {
 		name       string
 		message    []byte
 		wrapped    bool
-		r1         structs.TickerData
+		r1         utils.TickerDataStruct
 		errorValue error
 		wantError  bool
 	}{
@@ -298,7 +298,7 @@ func TestHandleTickerMessage(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		var r1 structs.TickerData
+		var r1 utils.TickerDataStruct
 		err := HandleTickerMessage(tt.message, &r1)
 
 		// error test
@@ -322,7 +322,7 @@ func TestHandleTradeMessage(t *testing.T) {
 		name       string
 		message    []byte
 		wrapped    bool
-		r1         structs.TradeData
+		r1         utils.TradeDataStruct
 		errorValue error
 		wantError  bool
 	}{
@@ -331,7 +331,7 @@ func TestHandleTradeMessage(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		var r1 structs.TradeData
+		var r1 utils.TradeDataStruct
 		err := HandleTradeMessage(tt.message, &r1)
 
 		// error test

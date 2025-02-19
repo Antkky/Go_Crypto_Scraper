@@ -1,23 +1,21 @@
-package main
+package utils
 
 import (
 	"encoding/csv"
 	"fmt"
 	"os"
-
-	"github.com/Antkky/go_crypto_scraper/structs"
 )
 
 // Buffer Structs
 
 type TickerDataBuffer struct {
-	buffer   [][]structs.TickerData
+	buffer   [][]TickerDataStruct
 	maxSize  int
 	fileName string
 }
 
 type TradeDataBuffer struct {
-	buffer   [][]structs.TradeData
+	buffer   [][]TradeDataStruct
 	maxSize  int
 	fileName string
 }
@@ -25,26 +23,27 @@ type TradeDataBuffer struct {
 // Method to add data to the buffer
 // buffer.AddData([]structs.TickerData)
 
-func (c *TickerDataBuffer) AddData(record []structs.TickerData) {
+func (c *TickerDataBuffer) AddData(record []TickerDataStruct) {
 	c.buffer = append(c.buffer, record)
 	if len(c.buffer) >= c.maxSize {
-		c.SaveToCSV()
+		c.FlushData()
 		c.buffer = nil
 	}
 }
 
-func (c *TradeDataBuffer) AddData(record []structs.TradeData) {
+func (c *TradeDataBuffer) AddData(record []TradeDataStruct) {
 	c.buffer = append(c.buffer, record)
 	if len(c.buffer) >= c.maxSize {
-		c.SaveToCSV()
+		c.FlushData()
 		c.buffer = nil
 	}
 }
 
 // Method to save the buffer to a CSV file.
-// buffer.AddData([]structs.TickerData)
+// buffer.FlushData([]structs.TickerData)
 
-func (c *TickerDataBuffer) SaveToCSV() {
+// these two functions are the same but for different structs
+func (c *TickerDataBuffer) FlushData() {
 	// Create or open the CSV file for appending.
 	file, err := os.OpenFile(c.fileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
@@ -66,7 +65,8 @@ func (c *TickerDataBuffer) SaveToCSV() {
 	}
 }
 
-func (c *TradeDataBuffer) SaveToCSV() {
+// these two functions are the same but for different structs
+func (c *TradeDataBuffer) FlushData() {
 	// Create or open the CSV file for appending.
 	file, err := os.OpenFile(c.fileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
@@ -93,7 +93,7 @@ func (c *TradeDataBuffer) SaveToCSV() {
 
 func NewTickerCSVBuffer(maxSize int, fileName string) *TickerDataBuffer {
 	return &TickerDataBuffer{
-		buffer:   make([][]structs.TickerData, 0),
+		buffer:   make([][]TickerDataStruct, 0),
 		maxSize:  maxSize,
 		fileName: fileName,
 	}
@@ -101,7 +101,7 @@ func NewTickerCSVBuffer(maxSize int, fileName string) *TickerDataBuffer {
 
 func NewTradeCSVBuffer(maxSize int, fileName string) *TradeDataBuffer {
 	return &TradeDataBuffer{
-		buffer:   make([][]structs.TradeData, 0),
+		buffer:   make([][]TradeDataStruct, 0),
 		maxSize:  maxSize,
 		fileName: fileName,
 	}

@@ -1,14 +1,12 @@
-package main
+package utils
 
 import (
 	"testing"
-
-	"github.com/Antkky/go_crypto_scraper/structs"
 )
 
 var RouteSubscribeTestCases = []struct {
 	name           string
-	exchangeConfig structs.ExchangeConfig
+	exchangeConfig ExchangeConfig
 	errorValue     error
 	wantError      bool
 }{

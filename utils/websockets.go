@@ -1,4 +1,4 @@
-package main
+package utils
 
 import (
 	"encoding/json"
@@ -7,11 +7,10 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/Antkky/go_crypto_scraper/structs"
 	"github.com/gorilla/websocket"
 )
 
-func RouteSubscribe(exchange structs.ExchangeConfig, conn *websocket.Conn) error {
+func RouteSubscribe(exchange ExchangeConfig, conn *websocket.Conn) error {
 	// Loop Through Streams
 	var streams []map[string]interface{}
 	if err := json.Unmarshal(exchange.Streams, &streams); err != nil {

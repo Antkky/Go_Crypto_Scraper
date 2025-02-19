@@ -8,12 +8,12 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/Antkky/go_crypto_scraper/structs"
+	"github.com/Antkky/go_crypto_scraper/utils"
 	"github.com/gorilla/websocket"
 )
 
 // HandleConnection manages the lifecycle of a WebSocket connection to Binance.
-func HandleConnection(conn *websocket.Conn, exchange structs.ExchangeConfig) {
+func HandleConnection(conn *websocket.Conn, exchange utils.ExchangeConfig) {
 	if conn == nil {
 		log.Println("Connection is nil, exiting HandleConnection.")
 		return
@@ -75,7 +75,7 @@ func Subscribe(conn *websocket.Conn, stream map[string]interface{}, exchangeName
 	return nil
 }
 
-func ConsumeMessages(messageQueue chan []byte, done chan struct{}, exchange structs.ExchangeConfig) {
+func ConsumeMessages(messageQueue chan []byte, done chan struct{}, exchange utils.ExchangeConfig) {
 	defer close(done)
 	for message := range messageQueue {
 		if err := HandleMessage(message, exchange); err != nil {
@@ -84,7 +84,7 @@ func ConsumeMessages(messageQueue chan []byte, done chan struct{}, exchange stru
 	}
 }
 
-func ReceiveMessages(conn *websocket.Conn, messageQueue chan []byte, done chan struct{}, exchange structs.ExchangeConfig) {
+func ReceiveMessages(conn *websocket.Conn, messageQueue chan []byte, done chan struct{}, exchange utils.ExchangeConfig) {
 	defer close(done)
 	for {
 		_, message, err := conn.ReadMessage()
@@ -101,7 +101,7 @@ func ReceiveMessages(conn *websocket.Conn, messageQueue chan []byte, done chan s
 	}
 }
 
-func ProcessMessageType(message []byte, tickerData *structs.TickerData, tradeData *structs.TradeData) error {
+func ProcessMessageType(message []byte, tickerData *utils.TickerDataStruct, tradeData *utils.TradeDataStruct) error {
 	var pMessage GlobalMessageStruct
 	var eventType string
 
@@ -121,22 +121,22 @@ func ProcessMessageType(message []byte, tickerData *structs.TickerData, tradeDat
 	}
 }
 
-func HandleTickerMessage(message []byte, tickerData *structs.TickerData) error {
+func HandleTickerMessage(message []byte, tickerData *utils.TickerDataStruct) error {
 	// Add logic here to handle ticker message
 	// e.g., Unmarshal and process the data, based on whether it's wrapped or not
 	return nil
 }
 
-func HandleTradeMessage(message []byte, tradeData *structs.TradeData) error {
+func HandleTradeMessage(message []byte, tradeData *utils.TradeDataStruct) error {
 	// Add logic here to handle trade message
 	// e.g., Unmarshal and process the data, based on whether it's wrapped or not
 	return nil
 }
 
-func HandleMessage(message []byte, exchange structs.ExchangeConfig) error {
+func HandleMessage(message []byte, exchange utils.ExchangeConfig) error {
 	var (
-		tickerData structs.TickerData
-		tradeData  structs.TradeData
+		tickerData utils.TickerDataStruct
+		tradeData  utils.TradeDataStruct
 	)
 
 	if err := ProcessMessageType(message, &tickerData, &tradeData); err != nil {

@@ -1,4 +1,4 @@
-package structs
+package utils
 
 import "encoding/json"
 
@@ -10,7 +10,7 @@ type ExchangeConfig struct {
 }
 
 // add some functionallity
-type TickerData struct {
+type TickerDataStruct struct {
 	TimeStamp uint
 	Date      uint
 	Symbol    string
@@ -20,7 +20,7 @@ type TickerData struct {
 	AskSize   float32
 }
 
-type TradeData struct {
+type TradeDataStruct struct {
 	TimeStamp uint
 	Date      uint
 	Symbol    string
