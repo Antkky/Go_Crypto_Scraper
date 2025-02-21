@@ -47,17 +47,13 @@ func establishConnections(configs []utils.ExchangeConfig) ([]*websocket.Conn, er
 
 			// subscribe to the streams
 			for _, stream := range config.Streams {
-				message, ok := stream["message"].(map[string]interface{})
-				if !ok {
-					logger.Printf("❌ Invalid message format for stream %s", stream)
-					continue
-				}
-				streamData, err := json.Marshal(message)
+				bMessage, err := json.Marshal(stream.Message)
+
 				if err != nil {
-					logger.Printf("❌ Error marshaling stream %s: %s", stream, err)
-					continue
+					logger.Printf("❌ Error marshalling subscribe message %s: %s", stream, err)
 				}
-				if err := conn.WriteMessage(websocket.TextMessage, streamData); err != nil {
+
+				if err := conn.WriteMessage(websocket.TextMessage, bMessage); err != nil {
 					logger.Printf("❌ Error subscribing to stream %s: %s", stream, err)
 				}
 			}
