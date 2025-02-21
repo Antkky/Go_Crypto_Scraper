@@ -1,0 +1,94 @@
+[
+  {
+    "name": "Binance US",
+    "uri": "wss://stream.binance.us:9443/ws",
+    "streams": [
+      {
+        "type": "ticker",
+        "symbol": "BTCUSD",
+        "market": "spot",
+        "message": {
+          "method": "SUBSCRIBE",
+          "params": ["btcusdt@ticker"],
+          "id": 1
+        }
+      },
+      {
+        "type": "trade",
+        "symbol": "BTCUSD",
+        "market": "spot",
+        "message": {
+          "method": "SUBSCRIBE",
+          "params": ["btcusdt@trade"],
+          "id": 2
+        }
+      },
+      {
+        "type": "ticker",
+        "symbol": "ETHUSD",
+        "market": "spot",
+        "message": {
+          "method": "SUBSCRIBE",
+          "params": ["ethusdt@ticker"],
+          "id": 3
+        }
+      },
+      {
+        "type": "trade",
+        "symbol": "ETHUSD",
+        "market": "spot",
+        "message": {
+          "method": "SUBSCRIBE",
+          "params": ["ethusdt@trade"],
+          "id": 4
+        }
+      }
+    ]
+  },
+  {
+    "name": "Binance Global",
+    "uri": "wss://data-stream.binance.vision/stream",
+    "streams": [
+      {
+        "type": "ticker",
+        "symbol": "BTCUSD",
+        "market": "spot",
+        "message": {
+          "method": "SUBSCRIBE",
+          "params": ["btcusdt@ticker"],
+          "id": 1
+        }
+      },
+      {
+        "type": "trade",
+        "symbol": "BTCUSD",
+        "market": "spot",
+        "message": {
+          "method": "SUBSCRIBE",
+          "params": ["btcusdt@trade"],
+          "id": 2
+        }
+      },
+      {
+        "type": "ticker",
+        "symbol": "ETHUSD",
+        "market": "spot",
+        "message": {
+          "method": "SUBSCRIBE",
+          "params": ["ethusdt@ticker"],
+          "id": 3
+        }
+      },
+      {
+        "type": "trade",
+        "symbol": "ETHUSD",
+        "market": "spot",
+        "message": {
+          "method": "SUBSCRIBE",
+          "params": ["ethusdt@trade"],
+          "id": 4
+        }
+      }
+    ]
+  }
+]

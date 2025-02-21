@@ -7,232 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// _____________Table of Contents______________
-// var  ProcessMessageTypeTestCases : line-019
-// func TestProcessMessageType()    : line-236
-// var  HandleMessageTestCases      : line-269
-// func TestHandleMessage()         : line-289
-// func TestHandleTickerMessage()   : line-317
-// func TestHandleTradeMessage()    : line-364
-
-// Test Cases for ProcessMessageType
-var ProcessMessageTypeTestCases = []struct {
-	name       string
-	eventType  string
-	message    []byte
-	wrapped    bool
-	r1         utils.TickerDataStruct
-	r2         utils.TradeDataStruct
-	errorValue error
-	wantError  bool
-}{
-	// Unwrapped valid message
-	{
-		name:      "unwrapped valid message1",
-		eventType: "24hrMiniTicker",
-		message: []byte(`{}
-			"e": "24hrTicker",
-			"E": 1672515782136,
-			"s": "BNBBTC",
-			"p": "0.0015",
-			"P": "250.00",
-			"w": "0.0018",
-			"x": "0.0009",
-			"c": "0.0025",
-			"Q": "10",
-			"b": "0.0024",
-			"B": "10",
-			"a": "0.0026",
-			"A": "100",
-			"o": "0.0010",
-			"h": "0.0025",
-			"l": "0.0010",
-			"v": "10000",
-			"q": "18",
-			"O": 0,
-			"C": 86400000,
-			"F": 0,
-			"L": 18150,
-			"n": 18151
-		}`),
-		wrapped: false,
-		r1: utils.TickerDataStruct{
-			TimeStamp: 1028413123,
-			Date:      1823123,
-			Symbol:    "BTCUSDT",
-			BidPrice:  97245.24,
-			BidSize:   53,
-			AskPrice:  97260.20,
-			AskSize:   42,
-		},
-		r2:         utils.TradeDataStruct{},
-		errorValue: nil,
-		wantError:  false,
-	},
-
-	// Wrapped valid message
-	{
-		name:      "wrapped valid message1",
-		eventType: "24hrMiniTicker",
-		message: []byte(`{
-			"stream": "BTCUSDT@ticker",
-			"data": {
-				"e": "24hrTicker",
-				"E": 1672515782136,
-				"s": "BNBBTC",
-				"p": "0.0015",
-				"P": "250.00",
-				"w": "0.0018",
-				"x": "0.0009",
-				"c": "0.0025",
-				"Q": "10",
-				"b": "0.0024",
-				"B": "10",
-				"a": "0.0026",
-				"A": "100",
-				"o": "0.0010",
-				"h": "0.0025",
-				"l": "0.0010",
-				"v": "10000",
-				"q": "18",
-				"O": 0,
-				"C": 86400000,
-				"F": 0,
-				"L": 18150,
-				"n": 18151
-			}
-		}`),
-		wrapped: true,
-		r1: utils.TickerDataStruct{
-			TimeStamp: 1028413123,
-			Date:      1823123,
-			Symbol:    "BTCUSDT",
-			BidPrice:  97245.24,
-			BidSize:   53,
-			AskPrice:  97260.20,
-			AskSize:   42,
-		},
-		r2:         utils.TradeDataStruct{},
-		errorValue: nil,
-		wantError:  false,
-	},
-
-	// Unwrapped invalid message
-	{
-		name:      "unwrapped invalid message1",
-		eventType: "24hrMiniTicker",
-		message: []byte(`{
-			"stream": "BTCUSDT@ticker",
-			"data": {
-				"e": "24hrTicker",
-				"E": 1672515782136,
-				"s": "BNBBTC",
-				"p": "0.0015",
-				"P": "250.00",
-				"w": "0.0018",
-				"x": "0.0009",
-				"c": "0.0025",
-				"Q": "10",
-				"b": "0.0024",
-				"B": "10",
-				"a": "0.0026",
-				"A": "100",
-				"o": "0.0010",
-				"h": "0.0025",
-				"l": "0.0010",
-				"v": "10000",
-				"q": "18",
-				"O": 0,
-				"C": 86400000,
-				"F": 0,
-				"L": 18150,
-				"n": 18151
-			}
-		}`),
-		wrapped: false,
-		r1: utils.TickerDataStruct{
-			TimeStamp: 1028413123,
-			Date:      1823123,
-			Symbol:    "BTCUSDT",
-			BidPrice:  97245.24,
-			BidSize:   53,
-			AskPrice:  97260.20,
-			AskSize:   42,
-		},
-		r2:         utils.TradeDataStruct{},
-		errorValue: nil,
-		wantError:  true,
-	},
-
-	// Wrapped invalid message
-	{
-		name:      "wrapped invalid message1",
-		eventType: "24hrMiniTicker",
-		message: []byte(`{
-			"stream": "BTCUSDT@ticker",
-			"data": {
-				"e": "24hrTicker",
-				"E": 1672515782136,
-				"s": "BNBBTC",
-				"p": "0.0015",
-				"P": "250.00",
-				"w": "0.0018",
-				"x": "0.0009",
-				"c": "0.0025",
-				"Q": "10",
-				"b": "0.0024",
-				"B": "10",
-				"a": "0.0026",
-				"A": "100",
-				"o": "0.0010",
-				"h": "0.0025",
-				"l": "0.0010",
-				"v": "10000",
-				"q": "18",
-				"O": 0,
-				"C": 86400000,
-				"F": 0,
-				"L": 18150,
-				"n": 18151
-			}
-		}`),
-		wrapped: true,
-		r1: utils.TickerDataStruct{
-			TimeStamp: 1028413123,
-			Date:      1823123,
-			Symbol:    "BTCUSDT",
-			BidPrice:  97245.24,
-			BidSize:   53,
-			AskPrice:  97260.20,
-			AskSize:   42,
-		},
-		r2:         utils.TradeDataStruct{},
-		errorValue: nil,
-		wantError:  true,
-	},
-
-	// Invalid JSON message
-	{
-		name:      "invalid json message1",
-		eventType: "24hrMiniTicker",
-		message:   []byte(`{invalid json}`),
-		wrapped:   false,
-		r1: utils.TickerDataStruct{
-			TimeStamp: 1028413123,
-			Date:      1823123,
-			Symbol:    "BTCUSDT",
-			BidPrice:  97245.24,
-			BidSize:   53,
-			AskPrice:  97260.20,
-			AskSize:   42,
-		},
-		r2:         utils.TradeDataStruct{},
-		errorValue: nil,
-		wantError:  true,
-	},
-}
-
-// TestProcessMessageType
+// TestProcessMessage
 //
 // inputs
 // message : []byte
@@ -244,45 +19,38 @@ var ProcessMessageTypeTestCases = []struct {
 //
 // Description:
 // routes message for processing changes through pointer reference
-func TestProcessMessageType(t *testing.T) {
-	for _, tt := range ProcessMessageTypeTestCases {
+func TestProcessMessage(t *testing.T) {
+	for _, tt := range ProcessMessageTypeCases {
 		t.Run(tt.name, func(t *testing.T) {
 			var (
 				r1 utils.TickerDataStruct
 				r2 utils.TradeDataStruct
 			)
 
-			err := ProcessMessageType(tt.message, &r1, &r2)
+			// Call the ProcessMessage function
+			err := ProcessMessage(tt.message, &r1, &r2)
 
-			// error test
-			if assert.Error(t, err, "An error has occurred") {
-				if !tt.wantError && assert.Equal(t, tt.errorValue, err, "Unexpected error") {
-					t.Errorf("Unexpected error: %+v", err)
-				}
+			// Error handling logic
+			if tt.wantError {
+				// Assert that the error is not nil and matches the expected error
+				assert.Error(t, err, "Expected an error but got none")
+				assert.ErrorIs(t, err, tt.errorValue, "Error type does not match expected")
+			} else {
+				// Ensure no error occurred if not expected
+				assert.NoError(t, err, "Unexpected error occurred")
 			}
 
-			// r1 test
-			if !assert.Equal(t, r1, tt.r1) && !tt.wantError {
-				t.Errorf("r1 isn't expected\nr1: %+v\n expected: %+v", r1, tt.r1)
-			}
-
-			// r2 test
-			if !assert.Equal(t, r2, tt.r2) && !tt.wantError {
-				t.Errorf("r2 isn't expected\nr2: %+v\n expected: %+v", r2, tt.r2)
+			// Validate the result based on event type
+			switch tt.eventType {
+			case "24hrTicker":
+				assert.Equal(t, tt.r1, r1, "Ticker data (r1) does not match expected output")
+			case "trade":
+				assert.Equal(t, tt.r2, r2, "Trade data (r2) does not match expected output")
+			default:
+				t.Errorf("Unexpected event type: %s", tt.eventType)
 			}
 		})
 	}
-}
-
-// Test Cases for HandleMessage
-var HandleMessageTestCases = []struct {
-	name       string
-	message    []byte
-	exchange   utils.ExchangeConfig
-	errorValue error
-	wantError  bool
-}{
-	{},
 }
 
 // TestHandleMessage
@@ -304,10 +72,12 @@ func TestHandleMessage(t *testing.T) {
 			err := HandleMessage(tt.message, tt.exchange)
 
 			// Test Errors
-			if assert.Error(t, err, "An error has occurred") {
-				if !tt.wantError && !assert.Equal(t, tt.errorValue, err, "Expected Error") {
-					t.Errorf("Unexpected Error: %+v", err)
+			if tt.wantError {
+				if assert.Error(t, err) {
+					assert.ErrorIs(t, err, tt.errorValue, "Error type does not match expected")
 				}
+			} else {
+				assert.NoError(t, err, "Unexpected error occurred")
 			}
 		})
 	}

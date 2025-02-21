@@ -33,18 +33,18 @@ func FormatData(record interface{}) []string {
 			strconv.FormatInt(int64(v.TimeStamp), 10),
 			strconv.FormatInt(int64(v.Date), 10),
 			v.Symbol,
-			strconv.FormatFloat(float64(v.BidPrice), 'f', -5, 32),
-			strconv.FormatFloat(float64(v.BidSize), 'f', -2, 32),
-			strconv.FormatFloat(float64(v.AskPrice), 'f', -5, 32),
-			strconv.FormatFloat(float64(v.AskSize), 'f', -2, 32),
+			v.BidPrice,
+			v.BidSize,
+			v.AskPrice,
+			v.AskSize,
 		}
 	case TradeDataStruct:
 		return []string{
 			strconv.FormatInt(int64(v.TimeStamp), 10),
 			strconv.FormatInt(int64(v.Date), 10),
 			v.Symbol,
-			strconv.FormatFloat(float64(v.Price), 'f', -5, 32),
-			strconv.FormatFloat(float64(v.Quantity), 'f', -2, 32),
+			v.Price,
+			v.Quantity,
 			strconv.FormatBool(v.Bid_MM),
 		}
 	default:

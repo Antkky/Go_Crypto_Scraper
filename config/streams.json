@@ -9,7 +9,8 @@
         "market": "spot",
         "message": {
           "method": "SUBSCRIBE",
-          "params": ["btcusdt@ticker"]
+          "params": ["btcusdt@ticker"],
+          "id": 1
         }
       },
       {
@@ -18,7 +19,8 @@
         "market": "spot",
         "message": {
           "method": "SUBSCRIBE",
-          "params": ["btcusdt@trade"]
+          "params": ["btcusdt@trade"],
+          "id": 2
         }
       },
       {
@@ -27,7 +29,8 @@
         "market": "spot",
         "message": {
           "method": "SUBSCRIBE",
-          "params": ["ethusdt@ticker"]
+          "params": ["ethusdt@ticker"],
+          "id": 3
         }
       },
       {
@@ -36,7 +39,8 @@
         "market": "spot",
         "message": {
           "method": "SUBSCRIBE",
-          "params": ["ethusdt@trade"]
+          "params": ["ethusdt@trade"],
+          "id": 4
         }
       }
     ]
@@ -51,7 +55,8 @@
         "market": "spot",
         "message": {
           "method": "SUBSCRIBE",
-          "params": ["btcusdt@ticker"]
+          "params": ["btcusdt@ticker"],
+          "id": 1
         }
       },
       {
@@ -60,7 +65,8 @@
         "market": "spot",
         "message": {
           "method": "SUBSCRIBE",
-          "params": ["btcusdt@trade"]
+          "params": ["btcusdt@trade"],
+          "id": 2
         }
       },
       {
@@ -69,7 +75,8 @@
         "market": "spot",
         "message": {
           "method": "SUBSCRIBE",
-          "params": ["ethusdt@ticker"]
+          "params": ["ethusdt@ticker"],
+          "id": 3
         }
       },
       {
@@ -78,7 +85,8 @@
         "market": "spot",
         "message": {
           "method": "SUBSCRIBE",
-          "params": ["ethusdt@trade"]
+          "params": ["ethusdt@trade"],
+          "id": 4
         }
       }
     ]

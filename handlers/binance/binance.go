@@ -6,11 +6,23 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"strconv"
 	"time"
 
 	"github.com/Antkky/go_crypto_scraper/utils"
 	"github.com/gorilla/websocket"
 )
+
+func isEmpty(data interface{}) bool {
+	switch v := data.(type) {
+	case utils.TickerDataStruct:
+		return v == utils.TickerDataStruct{}
+	case utils.TradeDataStruct:
+		return v == utils.TradeDataStruct{}
+	default:
+		return true
+	}
+}
 
 // HandleConnection()
 //
@@ -31,6 +43,8 @@ func HandleConnection(conn *websocket.Conn, exchange utils.ExchangeConfig, buffe
 		log.Println("Connection is nil, exiting HandleConnection.")
 		return
 	}
+
+	// isEmpty checks if the given data is empty
 
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
@@ -53,8 +67,8 @@ func HandleConnection(conn *websocket.Conn, exchange utils.ExchangeConfig, buffe
 // Inputs:
 //
 //	messageQueue  : chan []byte
-//	done         : chan struct{}
-//	exchange     : utils.ExchangeConfig
+//	done          : chan struct{}
+//	exchange      : utils.ExchangeConfig
 //
 // Outputs:
 //
@@ -104,6 +118,21 @@ func ReceiveMessages(conn *websocket.Conn, messageQueue chan []byte, done chan s
 	}
 }
 
+func convertStringToFloat(value string) float32 {
+	f, err := strconv.ParseFloat(value, 32)
+	if err != nil {
+		return 0 // Handle error properly in production
+	}
+	return float32(f)
+}
+
+func extractEventType(msg GlobalMessageStruct) string {
+	if msg.Data.EventType != "" {
+		return msg.Data.EventType
+	}
+	return msg.EventType
+}
+
 // ProcessMessageType()
 //
 // Inputs:
@@ -119,27 +148,36 @@ func ReceiveMessages(conn *websocket.Conn, messageQueue chan []byte, done chan s
 // Description:
 //
 //	basically routes the data to the correct processing function
-func ProcessMessageType(message []byte, tickerData *utils.TickerDataStruct, tradeData *utils.TradeDataStruct) error {
+func ProcessMessage(message []byte, tickerData *utils.TickerDataStruct, tradeData *utils.TradeDataStruct) error {
 	var pMessage GlobalMessageStruct
-	var eventType string
 
-	if pMessage.Data.EventType == "" {
-		eventType = pMessage.EventType
-	} else {
-		eventType = pMessage.Data.EventType
+	if err := json.Unmarshal(message, &pMessage); err != nil {
+		return err
 	}
 
-	switch eventType {
+	switch extractEventType(pMessage) {
 	case "24hrTicker":
-		if err := json.Unmarshal(message, tickerData); err != nil {
+		var tickerMsg TickerData
+		if err := json.Unmarshal(message, &tickerMsg); err != nil {
 			return err
+		}
+		*tickerData = utils.TickerDataStruct{
+			TimeStamp: uint(tickerMsg.EventTime),
+			Date:      uint(tickerMsg.EventTime),
+			Symbol:    tickerMsg.Symbol,
+			BidPrice:  tickerMsg.BidPrice.String(),
+			BidSize:   tickerMsg.BidSize.String(),
+			AskPrice:  tickerMsg.AskPrice.String(),
+			AskSize:   tickerMsg.AskSize.String(),
 		}
 	case "trade":
-		if err := json.Unmarshal(message, tradeData); err != nil {
+		var tradeMsg utils.TradeDataStruct
+		if err := json.Unmarshal(message, &tradeMsg); err != nil {
 			return err
 		}
+		*tradeData = tradeMsg
 	default:
-		return errors.New("unhandled event type: " + eventType)
+		return errors.New("unknown message type")
 	}
 	return nil
 }
@@ -163,15 +201,19 @@ func HandleMessage(message []byte, exchange utils.ExchangeConfig) error {
 		tickerData utils.TickerDataStruct
 		tradeData  utils.TradeDataStruct
 	)
-
-	if err := ProcessMessageType(message, &tickerData, &tradeData); err != nil {
+	if err := ProcessMessage(message, &tickerData, &tradeData); err != nil {
 		return err
 	}
 
-	if (tickerData != utils.TickerDataStruct{}) {
-		log.Printf("Ticker data for %s", exchange.Name)
-	} else if (tradeData != utils.TradeDataStruct{}) {
-		log.Printf("Trade data for %s", exchange.Name)
+	// Handle ticker data
+	if !isEmpty(tickerData) {
+		log.Printf("Ticker data for %s: %+v", exchange.Name, tickerData)
+	} else if !isEmpty(tradeData) {
+		// Handle trade data
+		log.Printf("Trade data for %s: %+v", exchange.Name, tradeData)
+	} else {
+		// Log when no useful data is found
+		log.Printf("Received message for %s but data is empty: %s", exchange.Name, string(message))
 	}
 
 	return nil

@@ -47,7 +47,12 @@ func establishConnections(configs []utils.ExchangeConfig) ([]*websocket.Conn, er
 
 			// subscribe to the streams
 			for _, stream := range config.Streams {
-				streamData, err := json.Marshal(stream)
+				message, ok := stream["message"].(map[string]interface{})
+				if !ok {
+					logger.Printf("❌ Invalid message format for stream %s", stream)
+					continue
+				}
+				streamData, err := json.Marshal(message)
 				if err != nil {
 					logger.Printf("❌ Error marshaling stream %s: %s", stream, err)
 					continue
@@ -105,7 +110,7 @@ func gracefulShutdown(connections []*websocket.Conn) {
 
 func main() {
 	// Read and parse configuration
-	configs, err := readConfig("config/streams.json")
+	configs, err := readConfig("config/streams2.json")
 	if err != nil {
 		logger.Fatalf("Error loading config: %s", err)
 	}
