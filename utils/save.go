@@ -11,13 +11,13 @@ import (
 func (c *DataBuffer) AddData(record interface{}) error {
 	switch v := record.(type) {
 	case []TickerDataStruct:
-		c.tickerBuffer = append(c.tickerBuffer, v)
-		if uint16(len(c.tickerBuffer)) >= c.maxSize {
+		c.TickerBuffer = append(c.TickerBuffer, v)
+		if uint16(len(c.TickerBuffer)) >= c.MaxSize {
 			return c.FlushData()
 		}
 	case []TradeDataStruct:
-		c.tradeBuffer = append(c.tradeBuffer, v)
-		if uint16(len(c.tradeBuffer)) >= c.maxSize {
+		c.TradeBuffer = append(c.TradeBuffer, v)
+		if uint16(len(c.TradeBuffer)) >= c.MaxSize {
 			return c.FlushData()
 		}
 	default:
@@ -53,20 +53,22 @@ func FormatData(record interface{}) []string {
 }
 
 func (c *DataBuffer) FlushData() error {
-	file, err := os.OpenFile(c.fileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	filepath := fmt.Sprintf("%s%s", c.FilePath, c.FileName)
+
+	file, err := os.OpenFile(filepath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return fmt.Errorf("error opening file: %w", err)
 	}
 	defer file.Close()
 
-	isEmpty := fileIsEmpty(c.fileName)
+	isEmpty := fileIsEmpty(filepath)
 	writer := csv.NewWriter(file)
 	defer writer.Flush()
 
 	// Write header if file is empty
 	if isEmpty {
 		header := []string{"TimeStamp", "Date", "Symbol", "BidPrice", "BidSize", "AskPrice", "AskSize"}
-		if c.dataType == "trade" {
+		if c.DataType == "trade" {
 			header = []string{"TimeStamp", "Date", "Symbol", "Price", "Quantity", "Bid_MM"}
 		}
 		if err := writer.Write(header); err != nil {
@@ -75,24 +77,24 @@ func (c *DataBuffer) FlushData() error {
 	}
 
 	// Write buffer data
-	if c.dataType == "ticker" {
-		for _, batch := range c.tickerBuffer {
+	if c.DataType == "ticker" {
+		for _, batch := range c.TickerBuffer {
 			for _, record := range batch {
 				if err := writer.Write(FormatData(record)); err != nil {
 					return fmt.Errorf("error writing record to CSV: %w", err)
 				}
 			}
 		}
-		c.tickerBuffer = make([][]TickerDataStruct, 0) // Reset efficiently
-	} else if c.dataType == "trade" {
-		for _, batch := range c.tradeBuffer {
+		c.TickerBuffer = make([][]TickerDataStruct, 0)
+	} else if c.DataType == "trade" {
+		for _, batch := range c.TradeBuffer {
 			for _, record := range batch {
 				if err := writer.Write(FormatData(record)); err != nil {
 					return fmt.Errorf("error writing record to CSV: %w", err)
 				}
 			}
 		}
-		c.tradeBuffer = make([][]TradeDataStruct, 0) // Reset efficiently
+		c.TradeBuffer = make([][]TradeDataStruct, 0)
 	} else {
 		return fmt.Errorf("unsupported data type")
 	}
@@ -107,13 +109,15 @@ func fileIsEmpty(filename string) bool {
 }
 
 // Create a new buffer
-func NewDataBuffer(dataType string, dataStream string, maxSize int, fileName string) *DataBuffer {
+func NewDataBuffer(dataType string, market string, id string, maxSize int, fileName string, filePath string) *DataBuffer {
 	return &DataBuffer{
-		tickerBuffer: make([][]TickerDataStruct, 0),
-		tradeBuffer:  make([][]TradeDataStruct, 0),
-		dataType:     dataType,
-		dataStream:   dataStream,
-		maxSize:      uint16(maxSize),
-		fileName:     fileName,
+		TickerBuffer: make([][]TickerDataStruct, 0),
+		TradeBuffer:  make([][]TradeDataStruct, 0),
+		DataType:     dataType,
+		Market:       market,
+		ID:           id,
+		MaxSize:      uint16(maxSize),
+		FileName:     fileName,
+		FilePath:     filePath,
 	}
 }

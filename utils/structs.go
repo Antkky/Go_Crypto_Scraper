@@ -39,11 +39,13 @@ type TradeDataStruct struct {
 
 // Buffer Structs
 type DataBuffer struct {
-	tickerBuffer [][]TickerDataStruct
-	tradeBuffer  [][]TradeDataStruct
-	maxSize      uint16
-	dataType     string
-	dataStream   string
-	//filePath     string
-	fileName string
+	TickerBuffer [][]TickerDataStruct
+	TradeBuffer  [][]TradeDataStruct
+	MaxSize      uint16
+	DataType     string
+	Symbol       string
+	Market       string
+	ID           string
+	FilePath     string
+	FileName     string
 }

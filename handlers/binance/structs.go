@@ -14,6 +14,7 @@ type GlobalMessageStruct struct {
 	EventTime int64  `json:"E"`
 	Symbol    string `json:"s"`
 	Result    string `json:"result"`
+	ID        int    `json:"id"`
 }
 
 type GlobalMessagePayload struct {

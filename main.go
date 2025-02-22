@@ -44,21 +44,6 @@ func establishConnections(configs []utils.ExchangeConfig) ([]*websocket.Conn, er
 		} else {
 			logger.Printf("✅ Connection established for %s", config.Name)
 			connections = append(connections, conn)
-
-			// subscribe to the streams
-			for _, stream := range config.Streams {
-				bMessage, err := json.Marshal(stream.Message)
-
-				if err != nil {
-					logger.Printf("❌ Error marshalling subscribe message %s: %s", stream, err)
-				}
-
-				if err := conn.WriteMessage(websocket.TextMessage, bMessage); err != nil {
-					logger.Printf("❌ Error subscribing to stream %s: %s", stream, err)
-				}
-			}
-
-			// Handle connection in separate goroutines based on exchange
 			go handleExchangeConnection(config, conn)
 		}
 	}
@@ -70,7 +55,7 @@ func establishConnections(configs []utils.ExchangeConfig) ([]*websocket.Conn, er
 func handleExchangeConnection(config utils.ExchangeConfig, conn *websocket.Conn) {
 	switch {
 	case strings.Contains(config.Name, "Binance"):
-		binance.HandleConnection(conn, config, utils.DataBuffer{}) // fix this
+		binance.HandleConnection(conn, config)
 	case strings.Contains(config.Name, "Coinex"):
 		//coinex.HandleConnection(conn, config)
 	case strings.Contains(config.Name, "Bybit"):

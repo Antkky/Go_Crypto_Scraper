@@ -15,29 +15,16 @@
               "state": {
                 "file": "Process Flow Chart.canvas",
                 "viewState": {
-                  "x": 1704.7677016842194,
-                  "y": 241.38400164498313,
-                  "zoom": -2.475719665464909
+                  "x": 3154.0900632235143,
+                  "y": 1181.0046581763831,
+                  "zoom": -0.5999999999999999
                 }
               },
               "icon": "lucide-layout-dashboard",
               "title": "Process Flow Chart"
             }
-          },
-          {
-            "id": "6055f89d0fff539f",
-            "type": "leaf",
-            "state": {
-              "type": "release-notes",
-              "state": {
-                "currentVersion": "1.8.7"
-              },
-              "icon": "lucide-book-up",
-              "title": "Release Notes 1.8.7"
-            }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "vertical"
@@ -184,7 +171,7 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "6055f89d0fff539f",
+  "active": "00f56580d941d6c3",
   "lastOpenFiles": [
     "handlers/binance/binance_test.go~",
     "handlers/binance/__debug_bin1115998560",

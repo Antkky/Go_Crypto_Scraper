@@ -5,7 +5,7 @@
     "streams": [
       {
         "type": "ticker",
-        "symbol": "BTCUSD",
+        "symbol": "BTCUSDT",
         "market": "spot",
         "message": {
           "method": "SUBSCRIBE",
@@ -15,7 +15,7 @@
       },
       {
         "type": "trade",
-        "symbol": "BTCUSD",
+        "symbol": "BTCUSDT",
         "market": "spot",
         "message": {
           "method": "SUBSCRIBE",
@@ -25,7 +25,7 @@
       },
       {
         "type": "ticker",
-        "symbol": "ETHUSD",
+        "symbol": "ETHUSDT",
         "market": "spot",
         "message": {
           "method": "SUBSCRIBE",
@@ -35,7 +35,7 @@
       },
       {
         "type": "trade",
-        "symbol": "ETHUSD",
+        "symbol": "ETHUSDT",
         "market": "spot",
         "message": {
           "method": "SUBSCRIBE",
@@ -51,7 +51,7 @@
     "streams": [
       {
         "type": "ticker",
-        "symbol": "BTCUSD",
+        "symbol": "BTCUSDT",
         "market": "spot",
         "message": {
           "method": "SUBSCRIBE",
@@ -61,7 +61,7 @@
       },
       {
         "type": "trade",
-        "symbol": "BTCUSD",
+        "symbol": "BTCUSDT",
         "market": "spot",
         "message": {
           "method": "SUBSCRIBE",
@@ -71,7 +71,7 @@
       },
       {
         "type": "ticker",
-        "symbol": "ETHUSD",
+        "symbol": "ETHUSDT",
         "market": "spot",
         "message": {
           "method": "SUBSCRIBE",
@@ -81,7 +81,7 @@
       },
       {
         "type": "trade",
-        "symbol": "ETHUSD",
+        "symbol": "ETHUSDT",
         "market": "spot",
         "message": {
           "method": "SUBSCRIBE",

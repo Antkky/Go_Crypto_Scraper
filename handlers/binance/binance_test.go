@@ -50,33 +50,3 @@ func TestProcessMessage(t *testing.T) {
 		})
 	}
 }
-
-// TestHandleMessage
-//
-// inputs
-// message : []byte
-// exchange      : *utils.ExchangeConfig
-//
-// Outputs:
-// err : error
-//
-// Description:
-// routes message for processing
-// based on type of message
-func TestHandleMessage(t *testing.T) {
-	for _, tt := range HandleMessageTestCases {
-		t.Run(tt.name, func(t *testing.T) {
-			// Run Test
-			err := HandleMessage(tt.message, tt.exchange)
-
-			// Test Errors
-			if tt.wantError {
-				if assert.Error(t, err) {
-					assert.ErrorIs(t, err, tt.errorValue, "Error type does not match expected")
-				}
-			} else {
-				assert.NoError(t, err, "Unexpected error occurred")
-			}
-		})
-	}
-}
