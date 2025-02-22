@@ -12,12 +12,12 @@ func (c *DataBuffer) AddData(record interface{}) error {
 	switch v := record.(type) {
 	case []TickerDataStruct:
 		c.tickerBuffer = append(c.tickerBuffer, v)
-		if len(c.tickerBuffer) >= c.maxSize {
+		if uint16(len(c.tickerBuffer)) >= c.maxSize {
 			return c.FlushData()
 		}
 	case []TradeDataStruct:
 		c.tradeBuffer = append(c.tradeBuffer, v)
-		if len(c.tradeBuffer) >= c.maxSize {
+		if uint16(len(c.tradeBuffer)) >= c.maxSize {
 			return c.FlushData()
 		}
 	default:
@@ -113,7 +113,7 @@ func NewDataBuffer(dataType string, dataStream string, maxSize int, fileName str
 		tradeBuffer:  make([][]TradeDataStruct, 0),
 		dataType:     dataType,
 		dataStream:   dataStream,
-		maxSize:      maxSize,
+		maxSize:      uint16(maxSize),
 		fileName:     fileName,
 	}
 }

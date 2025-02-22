@@ -163,8 +163,8 @@ func ProcessMessage(message []byte, tickerData *utils.TickerDataStruct, tradeDat
 			return err
 		}
 		*tickerData = utils.TickerDataStruct{
-			TimeStamp: uint(tickerMsg.EventTime),
-			Date:      uint(tickerMsg.EventTime),
+			TimeStamp: uint64(tickerMsg.EventTime),
+			Date:      uint64(tickerMsg.EventTime),
 			Symbol:    tickerMsg.Symbol,
 			BidPrice:  tickerMsg.BidPrice.String(),
 			BidSize:   tickerMsg.BidSize.String(),

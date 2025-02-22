@@ -187,6 +187,8 @@
   "active": "6055f89d0fff539f",
   "lastOpenFiles": [
     "handlers/binance/binance.go~",
+    "utils/save.go~",
+    "utils/structs.go~",
     "main.go~",
     "handlers/binance/__debug_bin2073469753",
     "handlers/binance/__debug_bin3917073951",
@@ -195,8 +197,6 @@
     "handlers/binance/binance_cases.go~",
     "handlers/binance/binance_cases.go",
     "config/streams2.json",
-    "utils/websockets.go~",
-    "utils/websockets_test.go",
     "main.md",
     "Data File Structure.canvas",
     "Process Flow Chart.canvas",

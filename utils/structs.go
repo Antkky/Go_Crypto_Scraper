@@ -19,8 +19,8 @@ type ExchangeConfig struct {
 
 // add some functionallity
 type TickerDataStruct struct {
-	TimeStamp uint
-	Date      uint
+	TimeStamp uint64
+	Date      uint64
 	Symbol    string
 	BidPrice  string
 	BidSize   string
@@ -29,8 +29,8 @@ type TickerDataStruct struct {
 }
 
 type TradeDataStruct struct {
-	TimeStamp uint
-	Date      uint
+	TimeStamp uint64
+	Date      uint64
 	Symbol    string
 	Price     string
 	Quantity  string
@@ -41,7 +41,7 @@ type TradeDataStruct struct {
 type DataBuffer struct {
 	tickerBuffer [][]TickerDataStruct
 	tradeBuffer  [][]TradeDataStruct
-	maxSize      int
+	maxSize      uint16
 	dataType     string
 	dataStream   string
 	//filePath     string
