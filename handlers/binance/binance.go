@@ -76,13 +76,10 @@ func InitializeStreams(conn *websocket.Conn, exchange utils.ExchangeConfig, data
 
 	for _, stream := range exchange.Streams {
 		bMessage, err := json.Marshal(stream.Message)
-		filename := fmt.Sprintf("%s_%s_%s.csv", exchange.Name, stream.Symbol, stream.Type)
-
-		// Create a buffer and store it in the map using the symbol as the key
-
+		filename := fmt.Sprintf("%s_%s_%s.csv", strings.ReplaceAll(exchange.Name, " ", ""), stream.Symbol, stream.Type)
 		bufferCode := fmt.Sprintf("%s:%s@%s", stream.Symbol, stream.Type, strings.ReplaceAll(exchange.Name, " ", ""))
 		filePath := fmt.Sprintf("data/%s/%s", strings.ReplaceAll(exchange.Name, " ", ""), stream.Symbol)
-		(*dataBuffers)[bufferCode] = utils.NewDataBuffer(stream.Type, stream.Market, bufferCode, 10, filename, filePath)
+		(*dataBuffers)[bufferCode] = utils.NewDataBuffer(stream.Type, stream.Market, bufferCode, 250, filename, filePath)
 
 		if err != nil {
 			log.Printf("❌ Error marshalling subscribe message %v: %s", stream, err)
@@ -123,10 +120,9 @@ func HandleConnection(conn *websocket.Conn, exchange utils.ExchangeConfig) {
 	signal.Notify(interrupt, os.Interrupt)
 	defer signal.Stop(interrupt)
 
-	messageQueue := make(chan []byte, 100)
+	messageQueue := make(chan []byte, 500)
 	done := make(chan struct{})
 
-	// loop through streams & create buffer
 	dataBuffers := make(map[string]*utils.DataBuffer)
 	if err := InitializeStreams(conn, exchange, &dataBuffers); err != nil {
 		return
@@ -225,8 +221,6 @@ func ProcessMessage(message []byte, tickerDataP *utils.TickerDataStruct, tradeDa
 //	This function performs constant time lookups for the buffer associated with each message.
 func ConsumeMessages(messageQueue chan []byte, exchange utils.ExchangeConfig, done chan struct{}, buffers map[string]*utils.DataBuffer) {
 	defer close(done)
-
-	// Avoid repetitive exchange name modification by cleaning it once
 	normalizedExchangeName := strings.ReplaceAll(exchange.Name, " ", "")
 
 	for message := range messageQueue {
@@ -236,21 +230,16 @@ func ConsumeMessages(messageQueue chan []byte, exchange utils.ExchangeConfig, do
 			bufferCode string
 		)
 
-		// Process the incoming message and extract relevant data
 		dataType, err := ProcessMessage(message, &tickerData, &tradeData)
 		if err != nil {
 			log.Printf("❌ Error processing message: %v", err)
 			continue
 		}
 
-		// Skip unknown message types early
-		if dataType == 0 {
+		switch dataType {
+		case 0:
 			log.Println("⚠️ Unknown message type, skipping message")
 			continue
-		}
-
-		// Generate the bufferCode dynamically based on the message type and relevant data
-		switch dataType {
 		case 1:
 			if tickerData.Symbol != "" {
 				bufferCode = fmt.Sprintf("%s:ticker@%s", tickerData.Symbol, normalizedExchangeName)
@@ -261,13 +250,18 @@ func ConsumeMessages(messageQueue chan []byte, exchange utils.ExchangeConfig, do
 			}
 		}
 
-		// Perform O(1) lookup and add data to the buffer if exists
 		if bufferCode != "" {
 			if buffer, exists := buffers[bufferCode]; exists {
 				if dataType == 1 {
-					buffer.AddData(tickerData)
+					if err := buffer.AddData(tickerData); err != nil {
+						log.Println("Error adding data to buffer: ", err)
+						return
+					}
 				} else {
-					buffer.AddData(tradeData)
+					if err := buffer.AddData(tradeData); err != nil {
+						log.Println("Error adding data to buffer: ", err)
+						return
+					}
 				}
 			} else {
 				log.Printf("⚠️ No buffer found for ID: %s", bufferCode)
@@ -302,9 +296,11 @@ func ReceiveMessages(conn *websocket.Conn, messageQueue chan []byte, done chan s
 			return
 		}
 
-		// Efficient message queue handling with non-blocking send
 		select {
 		case messageQueue <- message:
+			//bruh
+		case <-time.After(time.Millisecond * 100):
+			log.Println("Producer slowed down")
 		default:
 			log.Printf("⚠️ Message queue full, dropping message for %s", exchange.Name)
 		}
