@@ -28,23 +28,21 @@ func TestProcessMessage(t *testing.T) {
 			)
 
 			// Call the ProcessMessage function
-			err := ProcessMessage(tt.message, &r1, &r2)
+			dataType, err := ProcessMessage(tt.message, &r1, &r2)
 
 			// Error handling logic
 			if tt.wantError {
-				// Assert that the error is not nil and matches the expected error
 				assert.Error(t, err, "Expected an error but got none")
 				assert.ErrorIs(t, err, tt.errorValue, "Error type does not match expected")
 			} else {
-				// Ensure no error occurred if not expected
 				assert.NoError(t, err, "Unexpected error occurred")
 			}
 
 			// Validate the result based on event type
-			switch tt.eventType {
-			case "24hrTicker":
+			switch dataType {
+			case 1:
 				assert.Equal(t, tt.r1, r1, "Ticker data (r1) does not match expected output")
-			case "trade":
+			case 2:
 				assert.Equal(t, tt.r2, r2, "Trade data (r2) does not match expected output")
 			default:
 				t.Errorf("Unexpected event type: %s", tt.eventType)

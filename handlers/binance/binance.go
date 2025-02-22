@@ -6,22 +6,26 @@ import (
 	"log"
 	"os"
 	"os/signal"
-	"strconv"
 	"time"
 
 	"github.com/Antkky/go_crypto_scraper/utils"
 	"github.com/gorilla/websocket"
 )
 
-func isEmpty(data interface{}) bool {
-	switch v := data.(type) {
-	case utils.TickerDataStruct:
-		return v == utils.TickerDataStruct{}
-	case utils.TradeDataStruct:
-		return v == utils.TradeDataStruct{}
-	default:
-		return true
+func WrappedCheck(message []byte) (bool, error) {
+	var pMessage GlobalMessageStruct
+
+	if err := json.Unmarshal(message, &pMessage); err != nil {
+		return false, err
 	}
+
+	if pMessage.Data.EventType != "" {
+		return true, nil
+	}
+	if pMessage.EventType != "" {
+		return false, nil
+	}
+	return false, errors.New("unknown message type")
 }
 
 // HandleConnection()
@@ -118,19 +122,26 @@ func ReceiveMessages(conn *websocket.Conn, messageQueue chan []byte, done chan s
 	}
 }
 
-func convertStringToFloat(value string) float32 {
-	f, err := strconv.ParseFloat(value, 32)
-	if err != nil {
-		return 0 // Handle error properly in production
-	}
-	return float32(f)
-}
-
 func extractEventType(msg GlobalMessageStruct) string {
 	if msg.Data.EventType != "" {
 		return msg.Data.EventType
 	}
 	return msg.EventType
+}
+
+func processWrapped(wrapped bool, message []byte, bmessage *[]byte) error {
+	if wrapped {
+		var wrappedMsg struct {
+			Data json.RawMessage `json:"data"`
+		}
+		if err := json.Unmarshal(message, &wrappedMsg); err != nil {
+			return err
+		}
+		*bmessage = wrappedMsg.Data
+	} else {
+		*bmessage = message
+	}
+	return nil
 }
 
 // ProcessMessageType()
@@ -148,39 +159,69 @@ func extractEventType(msg GlobalMessageStruct) string {
 // Description:
 //
 //	basically routes the data to the correct processing function
-func ProcessMessage(message []byte, tickerData *utils.TickerDataStruct, tradeData *utils.TradeDataStruct) error {
+func ProcessMessage(message []byte, tickerDataP *utils.TickerDataStruct, tradeData *utils.TradeDataStruct) (int, error) {
 	var pMessage GlobalMessageStruct
 
 	if err := json.Unmarshal(message, &pMessage); err != nil {
-		return err
+		return 0, err
 	}
-
 
 	switch extractEventType(pMessage) {
 	case "24hrTicker":
+		var bmessage []byte
 		var tickerMsg TickerData
-		if err := json.Unmarshal(message, &tickerMsg); err != nil {
-			return err
+		wrapped, err := WrappedCheck(message)
+		if err != nil {
+			return 1, err
 		}
-		*tickerData = utils.TickerDataStruct{
+
+		if err := processWrapped(wrapped, message, &bmessage); err != nil {
+			return 1, err
+		}
+
+		if err := json.Unmarshal(bmessage, &tickerMsg); err != nil {
+			return 1, err
+		}
+
+		*tickerDataP = utils.TickerDataStruct{
 			TimeStamp: uint64(tickerMsg.EventTime),
 			Date:      uint64(tickerMsg.EventTime),
 			Symbol:    tickerMsg.Symbol,
-			BidPrice:  tickerMsg.BidPrice.String(),
-			BidSize:   tickerMsg.BidSize.String(),
-			AskPrice:  tickerMsg.AskPrice.String(),
-			AskSize:   tickerMsg.AskSize.String(),
+			BidPrice:  string(tickerMsg.BidPrice),
+			BidSize:   string(tickerMsg.BidSize),
+			AskPrice:  string(tickerMsg.AskPrice),
+			AskSize:   string(tickerMsg.AskSize),
 		}
+
+		return 1, nil
 	case "trade":
-		var tradeMsg utils.TradeDataStruct
-		if err := json.Unmarshal(message, &tradeMsg); err != nil {
-			return err
+		var bmessage []byte
+		var tradeMsg TradeData
+		wrapped, err := WrappedCheck(message)
+		if err != nil {
+			return 2, err
 		}
-		*tradeData = tradeMsg
+
+		if err := processWrapped(wrapped, message, &bmessage); err != nil {
+			return 2, err
+		}
+
+		if err := json.Unmarshal(bmessage, &tradeMsg); err != nil {
+			return 2, err
+		}
+
+		*tradeData = utils.TradeDataStruct{
+			TimeStamp: uint64(tradeMsg.EventTime),
+			Date:      uint64(tradeMsg.EventTime),
+			Symbol:    tradeMsg.Symbol,
+			Price:     tradeMsg.Price,
+			Quantity:  tradeMsg.Quantity,
+			Bid_MM:    tradeMsg.IsMaker,
+		}
+		return 2, nil
 	default:
-		return errors.New("unknown message type")
+		return 0, errors.New("unknown message type")
 	}
-	return nil
 }
 
 // HandleMessage()
@@ -202,19 +243,21 @@ func HandleMessage(message []byte, exchange utils.ExchangeConfig) error {
 		tickerData utils.TickerDataStruct
 		tradeData  utils.TradeDataStruct
 	)
-	if err := ProcessMessage(message, &tickerData, &tradeData); err != nil {
+
+	dataType, err := ProcessMessage(message, &tickerData, &tradeData)
+	if err != nil {
 		return err
 	}
+	if dataType == 0 {
+		return errors.New("unknown message type")
+	}
 
-	// Handle ticker data
-	if !isEmpty(tickerData) {
-		log.Printf("Ticker data for %s: %+v", exchange.Name, tickerData)
-	} else if !isEmpty(tradeData) {
-		// Handle trade data
-		log.Printf("Trade data for %s: %+v", exchange.Name, tradeData)
+	if dataType == 1 && tickerData.Symbol != "" {
+		log.Printf("Ticker data for %s", exchange.Name)
+	} else if dataType == 2 && tradeData.Symbol != "" {
+		log.Printf("Trade data for %s", exchange.Name)
 	} else {
-		// Log when no useful data is found
-		log.Printf("Received message for %s but data is empty: %s", exchange.Name, string(message))
+		return errors.New("data is possibly empty: " + exchange.Name)
 	}
 
 	return nil
