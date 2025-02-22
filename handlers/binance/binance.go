@@ -155,7 +155,7 @@ func ProcessMessage(message []byte, tickerData *utils.TickerDataStruct, tradeDat
 		return err
 	}
 
-  
+
 	switch extractEventType(pMessage) {
 	case "24hrTicker":
 		var tickerMsg TickerData
