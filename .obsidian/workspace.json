@@ -4,24 +4,17 @@
     "type": "split",
     "children": [
       {
-        "id": "af0a566d87dda125",
+        "id": "e13b74eca8d39ea2",
         "type": "tabs",
         "children": [
           {
-            "id": "00f56580d941d6c3",
+            "id": "6bbc5f0468e0f381",
             "type": "leaf",
             "state": {
-              "type": "canvas",
-              "state": {
-                "file": "Process Flow Chart.canvas",
-                "viewState": {
-                  "x": 3154.0900632235143,
-                  "y": 1181.0046581763831,
-                  "zoom": -0.5999999999999999
-                }
-              },
-              "icon": "lucide-layout-dashboard",
-              "title": "Process Flow Chart"
+              "type": "empty",
+              "state": {},
+              "icon": "lucide-file",
+              "title": "New tab"
             }
           }
         ]
@@ -171,8 +164,11 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "00f56580d941d6c3",
+  "active": "6bbc5f0468e0f381",
   "lastOpenFiles": [
+    "test.md",
+    "handlers/coinex/ProcessMessage.md",
+    "Process Flow Chart.canvas",
     "data/BinanceGlobal/ETHUSDT/BinanceGlobal_ETHUSDT_ticker.csv",
     "data/BinanceGlobal/ETHUSDT",
     "data/BinanceGlobal/BTCUSDT/BinanceGlobal_BTCUSDT_ticker.csv",
@@ -183,10 +179,8 @@
     "data/BinanceUS",
     "data/BinanceGlobal/ETHUSDT/BinanceGlobal_ETHUSDT_trade.csv",
     "data/BinanceUS/BTCUSDT/BinanceUS_BTCUSDT_ticker.csv",
-    "data/BinanceUS/BTCUSDT",
     "main.md",
     "Data File Structure.canvas",
-    "Process Flow Chart.canvas",
     "Handle Connection.md",
     "Handle Message.md",
     "Handle Message 1.md",
@@ -219,7 +213,6 @@
     "bybit/demo_server.md",
     "bybit/structs.md",
     "bybit/tests.md",
-    "binance/tests.md",
-    "coinex/tests.md"
+    "binance/tests.md"
   ]
 }

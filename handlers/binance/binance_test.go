@@ -23,8 +23,8 @@ func TestProcessMessage(t *testing.T) {
 	for _, tt := range ProcessMessageTypeCases {
 		t.Run(tt.name, func(t *testing.T) {
 			var (
-				r1 utils.TickerDataStruct
-				r2 utils.TradeDataStruct
+				r1 []utils.TickerDataStruct
+				r2 []utils.TradeDataStruct
 			)
 
 			// Call the ProcessMessage function

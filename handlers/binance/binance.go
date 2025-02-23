@@ -73,7 +73,7 @@ func processWrapped(wrapped bool, message []byte, bmessage *[]byte) error {
 //
 //	Initializes the streams by subscribing to the streams and creating the data buffers
 func InitializeStreams(conn *websocket.Conn, exchange utils.ExchangeConfig, dataBuffers *map[string]*buffer.DataBuffer, logger *log.Logger) error {
-	*dataBuffers = make(map[string]*buffer.DataBuffer) // Initialize the map
+	*dataBuffers = make(map[string]*buffer.DataBuffer)
 
 	for _, stream := range exchange.Streams {
 		bMessage, err := json.Marshal(stream.Message)
@@ -153,7 +153,7 @@ func HandleConnection(conn *websocket.Conn, exchange utils.ExchangeConfig, logge
 // Description:
 //
 //	basically routes the data to the correct processing function
-func ProcessMessage(message []byte, tickerDataP *utils.TickerDataStruct, tradeData *utils.TradeDataStruct) (int, error) {
+func ProcessMessage(message []byte, tickerDataP *[]utils.TickerDataStruct, tradeData *[]utils.TradeDataStruct) (int, error) {
 	var pMessage GlobalMessageStruct
 	wrapped, err := WrappedCheck(message)
 	if err != nil {
@@ -175,14 +175,14 @@ func ProcessMessage(message []byte, tickerDataP *utils.TickerDataStruct, tradeDa
 		if err := json.Unmarshal(bmessage, &tickerMsg); err != nil {
 			return 1, err
 		}
-		*tickerDataP = utils.TickerDataStruct{
+		*tickerDataP = []utils.TickerDataStruct{{
 			TimeStamp: uint64(tickerMsg.EventTime),
 			Symbol:    tickerMsg.Symbol,
 			BidPrice:  string(tickerMsg.BidPrice),
 			BidSize:   string(tickerMsg.BidSize),
 			AskPrice:  string(tickerMsg.AskPrice),
 			AskSize:   string(tickerMsg.AskSize),
-		}
+		}}
 		return 1, nil
 
 	case "trade":
@@ -190,17 +190,17 @@ func ProcessMessage(message []byte, tickerDataP *utils.TickerDataStruct, tradeDa
 		if err := json.Unmarshal(bmessage, &tradeMsg); err != nil {
 			return 2, err
 		}
-		*tradeData = utils.TradeDataStruct{
+		*tradeData = []utils.TradeDataStruct{{
 			TimeStamp: uint64(tradeMsg.EventTime),
 			Symbol:    tradeMsg.Symbol,
 			Price:     tradeMsg.Price,
 			Quantity:  tradeMsg.Quantity,
 			Bid_MM:    tradeMsg.IsMaker,
-		}
+		}}
 		return 2, nil
 
 	default:
-		return 0, errors.New("unknown message type")
+		return 0, errors.New("unknown message type:")
 	}
 }
 
@@ -225,11 +225,9 @@ func ConsumeMessages(messageQueue chan []byte, exchange utils.ExchangeConfig, do
 	normalizedExchangeName := strings.ReplaceAll(exchange.Name, " ", "")
 
 	for message := range messageQueue {
-		var (
-			tickerData utils.TickerDataStruct
-			tradeData  utils.TradeDataStruct
-			bufferCode string
-		)
+		bufferCode := ""
+		tickerData := []utils.TickerDataStruct{}
+		tradeData := []utils.TradeDataStruct{}
 
 		dataType, err := ProcessMessage(message, &tickerData, &tradeData)
 		if err != nil {
@@ -242,12 +240,12 @@ func ConsumeMessages(messageQueue chan []byte, exchange utils.ExchangeConfig, do
 			logger.Println("⚠️ Unknown message type, skipping message")
 			continue
 		case 1:
-			if tickerData.Symbol != "" {
-				bufferCode = fmt.Sprintf("%s:ticker@%s", tickerData.Symbol, normalizedExchangeName)
+			if tickerData[0].Symbol != "" {
+				bufferCode = fmt.Sprintf("%s:ticker@%s", tickerData[0].Symbol, normalizedExchangeName)
 			}
 		case 2:
-			if tradeData.Symbol != "" {
-				bufferCode = fmt.Sprintf("%s:trade@%s", tradeData.Symbol, normalizedExchangeName)
+			if tradeData[0].Symbol != "" {
+				bufferCode = fmt.Sprintf("%s:trade@%s", tradeData[0].Symbol, normalizedExchangeName)
 			}
 		}
 

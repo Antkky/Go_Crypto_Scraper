@@ -4,7 +4,6 @@ import (
 	"encoding/csv"
 	"errors"
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 
@@ -115,20 +114,24 @@ func FormatData(record interface{}) ([]string, error) {
 }
 
 // Methods to add data to the buffer
-func (c *DataBuffer) AddData(record interface{}) error {
-	switch v := record.(type) {
-	case utils.TickerDataStruct:
-		c.TickerBuffer = append(c.TickerBuffer, v)
+func (c *DataBuffer) AddData(records interface{}) error {
+	switch data := records.(type) {
+	case []utils.TickerDataStruct:
+		c.TickerBuffer = append(c.TickerBuffer, data...)
 		if len(c.TickerBuffer) >= c.MaxSize {
-			return c.FlushData()
+			if err := c.FlushData(); err != nil {
+				return fmt.Errorf("failed to flush ticker data: %w", err)
+			}
 		}
-	case utils.TradeDataStruct:
-		c.TradeBuffer = append(c.TradeBuffer, v)
+	case []utils.TradeDataStruct:
+		c.TradeBuffer = append(c.TradeBuffer, data...)
 		if len(c.TradeBuffer) >= c.MaxSize {
-			return c.FlushData()
+			if err := c.FlushData(); err != nil {
+				return fmt.Errorf("failed to flush trade data: %w", err)
+			}
 		}
 	default:
-		return fmt.Errorf("unsupported data type")
+		return fmt.Errorf("unsupported data type: %T", records)
 	}
 	return nil
 }
@@ -138,7 +141,6 @@ func (c *DataBuffer) FlushData() error {
 	if err := validateFilePath(filepath); err != nil {
 		return fmt.Errorf("invalid file path: %w", err)
 	}
-	log.Println("Writing to file:", filepath)
 	file, err := os.OpenFile(filepath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return fmt.Errorf("error opening file: %w", err)

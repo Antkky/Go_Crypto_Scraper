@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/Antkky/go_crypto_scraper/handlers/binance"
+	"github.com/Antkky/go_crypto_scraper/handlers/coinex"
 	"github.com/Antkky/go_crypto_scraper/utils"
 	"github.com/gorilla/websocket"
 )
@@ -37,7 +38,7 @@ func handleExchangeConnection(config utils.ExchangeConfig, conn *websocket.Conn)
 	case strings.Contains(config.Name, "Binance"):
 		binance.HandleConnection(conn, config, logger)
 	case strings.Contains(config.Name, "Coinex"):
-		//coinex.HandleConnection(conn, config)
+		coinex.HandleConnection(conn, config, logger)
 	case strings.Contains(config.Name, "Bybit"):
 		//bybit.HandleConnection(conn, config)
 	case strings.Contains(config.Name, "Bitfinex"):

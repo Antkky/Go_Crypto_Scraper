@@ -6,7 +6,7 @@
       {
         "type": "ticker",
         "symbol": "BTCUSDT",
-        "market": "spot",
+        "market": "futures",
         "message": {
           "method": "SUBSCRIBE",
           "params": ["btcusdt@ticker"],
@@ -16,7 +16,7 @@
       {
         "type": "trade",
         "symbol": "BTCUSDT",
-        "market": "spot",
+        "market": "futures",
         "message": {
           "method": "SUBSCRIBE",
           "params": ["btcusdt@trade"],
@@ -26,7 +26,7 @@
       {
         "type": "ticker",
         "symbol": "ETHUSDT",
-        "market": "spot",
+        "market": "futures",
         "message": {
           "method": "SUBSCRIBE",
           "params": ["ethusdt@ticker"],
@@ -36,7 +36,7 @@
       {
         "type": "trade",
         "symbol": "ETHUSDT",
-        "market": "spot",
+        "market": "futures",
         "message": {
           "method": "SUBSCRIBE",
           "params": ["ethusdt@trade"],
@@ -52,7 +52,7 @@
       {
         "type": "ticker",
         "symbol": "BTCUSDT",
-        "market": "spot",
+        "market": "futures",
         "message": {
           "method": "SUBSCRIBE",
           "params": ["btcusdt@ticker"],
@@ -62,7 +62,7 @@
       {
         "type": "trade",
         "symbol": "BTCUSDT",
-        "market": "spot",
+        "market": "futures",
         "message": {
           "method": "SUBSCRIBE",
           "params": ["btcusdt@trade"],
@@ -72,7 +72,7 @@
       {
         "type": "ticker",
         "symbol": "ETHUSDT",
-        "market": "spot",
+        "market": "futures",
         "message": {
           "method": "SUBSCRIBE",
           "params": ["ethusdt@ticker"],
@@ -82,11 +82,103 @@
       {
         "type": "trade",
         "symbol": "ETHUSDT",
-        "market": "spot",
+        "market": "futures",
         "message": {
           "method": "SUBSCRIBE",
           "params": ["ethusdt@trade"],
           "id": 4
+        }
+      }
+    ]
+  },
+  {
+    "name": "Coinex Spot",
+    "uri": "wss://socket.coinex.com/v2/spot",
+    "streams": [
+      {
+        "type": "ticker",
+        "symbol": "BTCUSDT",
+        "market": "spot",
+        "message": {
+          "method": "bbo.subscribe",
+          "params": { "market_list": ["BTCUSDT"] },
+          "id": 1
+        }
+      },
+      {
+        "type": "trade",
+        "symbol": "BTCUSDT",
+        "market": "spot",
+        "message": {
+          "method": "deals.subscribe",
+          "params": { "market_list": ["BTCUSDT"] },
+          "id": 1
+        }
+      },
+      {
+        "type": "ticker",
+        "symbol": "ETHUSDT",
+        "market": "spot",
+        "message": {
+          "method": "bbo.subscribe",
+          "params": { "market_list": ["ETHUSDT"] },
+          "id": 1
+        }
+      },
+      {
+        "type": "trade",
+        "symbol": "ETHUSDT",
+        "market": "spot",
+        "message": {
+          "method": "deals.subscribe",
+          "params": { "market_list": ["ETHUSDT"] },
+          "id": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "Coinex Futures",
+    "uri": "wss://socket.coinex.com/v2/futures",
+    "streams": [
+      {
+        "type": "ticker",
+        "symbol": "BTCUSDT",
+        "market": "futures",
+        "message": {
+          "method": "bbo.subscribe",
+          "params": { "market_list": ["BTCUSDT"] },
+          "id": 1
+        }
+      },
+      {
+        "type": "trade",
+        "symbol": "BTCUSDT",
+        "market": "futures",
+        "message": {
+          "method": "deals.subscribe",
+          "params": { "market_list": ["BTCUSDT"] },
+          "id": 1
+        }
+      },
+      {
+        "type": "ticker",
+        "symbol": "ETHUSDT",
+        "market": "futures",
+        "message": {
+          "method": "bbo.subscribe",
+          "params": { "market_list": ["ETHUSDT"] },
+          "id": 1
+        }
+      },
+      {
+        "type": "trade",
+        "symbol": "ETHUSDT",
+        "market": "futures",
+        "message": {
+          "method": "deals.subscribe",
+          "params": { "market_list": ["ETHUSDT"] },
+          "id": 1
         }
       }
     ]
