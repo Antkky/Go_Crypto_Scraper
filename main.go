@@ -3,7 +3,9 @@ package main
 import (
 	"log"
 	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 
 	"github.com/Antkky/go_crypto_scraper/handlers/binance"
 	"github.com/Antkky/go_crypto_scraper/handlers/coinex"
@@ -48,6 +50,35 @@ func handleExchangeConnection(config utils.ExchangeConfig, conn *websocket.Conn)
 	}
 }
 
+// gracefulShutdown waits for a termination signal and closes all connections.
+func GracefulShutdown(connections []*websocket.Conn, configs []utils.ExchangeConfig, logger *log.Logger) {
+	// Wait for interrupt signal to gracefully shutdown the application.
+	signalChan := make(chan os.Signal, 1)
+	signal.Notify(signalChan, os.Interrupt, syscall.SIGTERM)
+
+	<-signalChan
+	logger.Println("⏳ Shutting down...")
+
+	for i, conn := range connections {
+		if conn != nil {
+			switch {
+			case strings.Contains(configs[i].Name, "Binance"):
+				binance.CloseConnection(conn, configs[i].Name, logger)
+			case strings.Contains(configs[i].Name, "Coinex"):
+				coinex.CloseConnection(conn, configs[i].Name, logger)
+			case strings.Contains(configs[i].Name, "Bybit"):
+				//bybit.HandleConnection(conn, config)
+			case strings.Contains(configs[i].Name, "Bitfinex"):
+				//bitfinex.HandleConnection(conn, config)
+			default:
+				logger.Printf("⚠️ Unhandled exchange: %s", configs[i].Name)
+			}
+		}
+	}
+
+	logger.Println("✅ Cleanup complete. Exiting.")
+}
+
 func main() {
 	// Read and parse configuration
 	configs, err := utils.ReadConfig("config/streams2.json")
@@ -62,5 +93,5 @@ func main() {
 	}
 
 	// Graceful shutdown handling
-	utils.GracefulShutdown(connections, logger)
+	GracefulShutdown(connections, configs, logger)
 }

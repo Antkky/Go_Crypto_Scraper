@@ -25,6 +25,46 @@
       },
       {
         "type": "ticker",
+        "symbol": "SOLUSDT",
+        "market": "futures",
+        "message": {
+          "method": "SUBSCRIBE",
+          "params": ["solusdt@ticker"],
+          "id": 5
+        }
+      },
+      {
+        "type": "trade",
+        "symbol": "SOLUSDT",
+        "market": "futures",
+        "message": {
+          "method": "SUBSCRIBE",
+          "params": ["solusdt@trade"],
+          "id": 5
+        }
+      },
+      {
+        "type": "ticker",
+        "symbol": "XRPUSDT",
+        "market": "futures",
+        "message": {
+          "method": "SUBSCRIBE",
+          "params": ["xrpusdt@ticker"],
+          "id": 5
+        }
+      },
+      {
+        "type": "trade",
+        "symbol": "XRPUSDT",
+        "market": "futures",
+        "message": {
+          "method": "SUBSCRIBE",
+          "params": ["xrpusdt@trade"],
+          "id": 5
+        }
+      },
+      {
+        "type": "ticker",
         "symbol": "ETHUSDT",
         "market": "futures",
         "message": {
@@ -66,6 +106,46 @@
         "message": {
           "method": "SUBSCRIBE",
           "params": ["btcusdt@trade"],
+          "id": 5
+        }
+      },
+      {
+        "type": "ticker",
+        "symbol": "SOLUSDT",
+        "market": "futures",
+        "message": {
+          "method": "SUBSCRIBE",
+          "params": ["solusdt@ticker"],
+          "id": 5
+        }
+      },
+      {
+        "type": "trade",
+        "symbol": "SOLUSDT",
+        "market": "futures",
+        "message": {
+          "method": "SUBSCRIBE",
+          "params": ["solusdt@trade"],
+          "id": 5
+        }
+      },
+      {
+        "type": "ticker",
+        "symbol": "XRPUSDT",
+        "market": "futures",
+        "message": {
+          "method": "SUBSCRIBE",
+          "params": ["xrpusdt@ticker"],
+          "id": 5
+        }
+      },
+      {
+        "type": "trade",
+        "symbol": "XRPUSDT",
+        "market": "futures",
+        "message": {
+          "method": "SUBSCRIBE",
+          "params": ["xrpusdt@trade"],
           "id": 5
         }
       },
@@ -117,6 +197,46 @@
       },
       {
         "type": "ticker",
+        "symbol": "SOLUSDT",
+        "market": "spot",
+        "message": {
+          "method": "bbo.subscribe",
+          "params": { "market_list": ["SOLUSDT"] },
+          "id": 1
+        }
+      },
+      {
+        "type": "trade",
+        "symbol": "SOLUSDT",
+        "market": "spot",
+        "message": {
+          "method": "deals.subscribe",
+          "params": { "market_list": ["SOLUSDT"] },
+          "id": 1
+        }
+      },
+      {
+        "type": "ticker",
+        "symbol": "XRPUSDT",
+        "market": "spot",
+        "message": {
+          "method": "bbo.subscribe",
+          "params": { "market_list": ["XRPUSDT"] },
+          "id": 1
+        }
+      },
+      {
+        "type": "trade",
+        "symbol": "XRPUSDT",
+        "market": "spot",
+        "message": {
+          "method": "deals.subscribe",
+          "params": { "market_list": ["XRPUSDT"] },
+          "id": 1
+        }
+      },
+      {
+        "type": "ticker",
         "symbol": "ETHUSDT",
         "market": "spot",
         "message": {
@@ -158,6 +278,46 @@
         "message": {
           "method": "deals.subscribe",
           "params": { "market_list": ["BTCUSDT"] },
+          "id": 1
+        }
+      },
+      {
+        "type": "ticker",
+        "symbol": "SOLUSDT",
+        "market": "futures",
+        "message": {
+          "method": "bbo.subscribe",
+          "params": { "market_list": ["SOLUSDT"] },
+          "id": 1
+        }
+      },
+      {
+        "type": "trade",
+        "symbol": "SOLUSDT",
+        "market": "futures",
+        "message": {
+          "method": "deals.subscribe",
+          "params": { "market_list": ["SOLUSDT"] },
+          "id": 1
+        }
+      },
+      {
+        "type": "ticker",
+        "symbol": "XRPUSDT",
+        "market": "futures",
+        "message": {
+          "method": "bbo.subscribe",
+          "params": { "market_list": ["XRPUSDT"] },
+          "id": 1
+        }
+      },
+      {
+        "type": "trade",
+        "symbol": "XRPUSDT",
+        "market": "futures",
+        "message": {
+          "method": "deals.subscribe",
+          "params": { "market_list": ["XRPUSDT"] },
           "id": 1
         }
       },

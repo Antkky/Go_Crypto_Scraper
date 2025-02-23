@@ -24,6 +24,30 @@
         }
       },
       {
+        "name": "Binance US",
+        "uri": "wss://stream.binance.us:9443/ws",
+        "streams": [
+          {
+            "type": "ticker",
+            "symbol": "SOLUSD",
+            "market": "spot",
+            "message": {
+              "method": "SUBSCRIBE",
+              "params": ["btcusdt@ticker"],
+              "id": 1
+            }
+          },
+          {
+            "type": "trade",
+            "symbol": "SOLUSD",
+            "market": "spot",
+            "message": {
+              "method": "SUBSCRIBE",
+              "params": ["btcusdt@trade"],
+              "id": 2
+            }
+          },
+      {
         "type": "ticker",
         "symbol": "ETHUSD",
         "market": "spot",

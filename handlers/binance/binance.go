@@ -1,12 +1,12 @@
 package binance
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
 	"os"
-  "bytes"
 	"os/signal"
 	"strings"
 	"time"
@@ -81,7 +81,7 @@ func InitializeStreams(conn *websocket.Conn, exchange utils.ExchangeConfig, data
 		filename := fmt.Sprintf("%s_%s_%s.csv", strings.ReplaceAll(exchange.Name, " ", ""), stream.Symbol, stream.Type)
 		bufferCode := fmt.Sprintf("%s:%s@%s", stream.Symbol, stream.Type, strings.ReplaceAll(exchange.Name, " ", ""))
 		filePath := fmt.Sprintf("data/%s/%s", strings.ReplaceAll(exchange.Name, " ", ""), stream.Symbol)
-		(*dataBuffers)[bufferCode] = buffer.NewDataBuffer(stream.Type, stream.Market, bufferCode, 250, filename, filePath)
+		(*dataBuffers)[bufferCode] = buffer.NewDataBuffer(stream.Type, stream.Market, bufferCode, 50, filename, filePath)
 
 		if err != nil {
 			logger.Printf("❌ Error marshalling subscribe message %v: %s", stream, err)
@@ -92,6 +92,7 @@ func InitializeStreams(conn *websocket.Conn, exchange utils.ExchangeConfig, data
 			logger.Printf("❌ Error subscribing to stream %v: %s", stream, err)
 			return err
 		}
+		time.Sleep(500 * time.Millisecond)
 	}
 	return nil
 }
@@ -155,12 +156,11 @@ func HandleConnection(conn *websocket.Conn, exchange utils.ExchangeConfig, logge
 //
 //	basically routes the data to the correct processing function
 func ProcessMessage(message []byte, tickerDataP *[]utils.TickerDataStruct, tradeData *[]utils.TradeDataStruct) (int, error) {
-	if bytes.Equal(message, []byte(`{"result":null,"id":5}`)){
-    return 5, nil
-  }
+	if bytes.Equal(message, []byte(`{"result":null,"id":5}`)) {
+		return 5, nil
+	}
 
-
-  var pMessage GlobalMessageStruct
+	var pMessage GlobalMessageStruct
 	wrapped, err := WrappedCheck(message)
 	if err != nil {
 		return 0, err
@@ -174,8 +174,6 @@ func ProcessMessage(message []byte, tickerDataP *[]utils.TickerDataStruct, trade
 	if err := json.Unmarshal(bmessage, &pMessage); err != nil {
 		return 0, err
 	}
-
-
 
 	switch {
 	case extractEventType(pMessage) == "24hrTicker":
@@ -208,7 +206,7 @@ func ProcessMessage(message []byte, tickerDataP *[]utils.TickerDataStruct, trade
 		return 2, nil
 
 	default:
-    return 0, fmt.Errorf("unknown message type: %s", message)	
+		return 0, fmt.Errorf("unknown message type: %s", message)
 	}
 }
 
@@ -255,8 +253,8 @@ func ConsumeMessages(messageQueue chan []byte, exchange utils.ExchangeConfig, do
 			if tradeData[0].Symbol != "" {
 				bufferCode = fmt.Sprintf("%s:trade@%s", tradeData[0].Symbol, normalizedExchangeName)
 			}
-    case 5:
-      logger.Println("✅ Subscribe Success")
+		case 5:
+			logger.Println("✅ Subscribe Success")
 		}
 
 		if bufferCode != "" {
@@ -331,13 +329,6 @@ func ReceiveMessages(conn *websocket.Conn, messageQueue chan []byte, done chan s
 //
 //	Gracefully close the connection by sending a closure message and gracefully close connection
 func CloseConnection(conn *websocket.Conn, exchangeName string, logger *log.Logger) {
-	closeMsg := websocket.FormatCloseMessage(websocket.CloseNormalClosure, "Normal closure")
-	if err := conn.WriteMessage(websocket.CloseMessage, closeMsg); err != nil {
-		logger.Printf("❌ Error sending close message for %s: %v", exchangeName, err)
-	}
-
-	time.Sleep(time.Second)
-
 	if err := conn.Close(); err != nil {
 		logger.Printf("❌ Error closing connection for %s: %v", exchangeName, err)
 	} else {
