@@ -73,7 +73,7 @@ func InitializeStreams(conn *websocket.Conn, exchange utils.ExchangeConfig, data
 			logger.Printf("❌ Error subscribing to stream %v: %s", stream, err)
 			return err
 		}
-	}
+  }
 	return nil
 }
 
@@ -145,8 +145,8 @@ func ProcessMessage(message []byte, tickerDataP *[]utils.TickerDataStruct, trade
 		return 0, fmt.Errorf("failed to unmarshal coinex message: %w", err)
 	}
 
-	switch pMessage.Method {
-	case "bbo.update":
+	switch {
+	case pMessage.Method == "bbo.update":
 		var tickerMsg TickerData
 		if err := json.Unmarshal(decompressed, &tickerMsg); err != nil {
 			return 1, fmt.Errorf("failed to unmarshal ticker data: %w", err)
@@ -161,7 +161,7 @@ func ProcessMessage(message []byte, tickerDataP *[]utils.TickerDataStruct, trade
 		})
 		return 1, nil
 
-	case "deals.update":
+	case pMessage.Method == "deals.update":
 		var tradeMsg TradeData
 		if err := json.Unmarshal(decompressed, &tradeMsg); err != nil {
 			return 1, fmt.Errorf("failed to unmarshal trade data: %w", err)
@@ -175,7 +175,10 @@ func ProcessMessage(message []byte, tickerDataP *[]utils.TickerDataStruct, trade
 				Bid_MM:    trade.Side == "sell",
 			})
 		}
-		return len(tradeMsg.Data.Deals), nil
+		return 2, nil
+
+  case bytes.Equal(decompressed, []byte(`{"id":1,"code":0,"message":"OK"}`)):
+    return 5, nil
 
 	default:
 		return 0, fmt.Errorf("unknown message type: %s", pMessage.Method)
@@ -215,7 +218,6 @@ func ConsumeMessages(messageQueue chan []byte, exchange utils.ExchangeConfig, do
 
 		switch dataType {
 		case 0:
-			logger.Println("⚠️ Unknown message type, skipping message")
 			continue
 		case 1:
 			if len(tickerData) > 0 && tickerData[0].Symbol != "" {
@@ -225,27 +227,31 @@ func ConsumeMessages(messageQueue chan []byte, exchange utils.ExchangeConfig, do
 			if len(tradeData) > 0 && tradeData[0].Symbol != "" {
 				bufferCode = fmt.Sprintf("%s:trade@%s", tradeData[0].Symbol, normalizedExchangeName)
 			}
-		}
-
+    case 5:
+      logger.Println("✅ Subscribe Success")
+      continue
+    }
 		if bufferCode != "" {
 			if buffer, exists := buffers[bufferCode]; exists {
 				if dataType == 1 {
 					if err := buffer.AddData(tickerData); err != nil {
-						logger.Println("Error adding data to buffer: ", err)
+						logger.Println("❌ Error adding data to buffer: ", err)
 						return
 					}
 				} else {
 					if err := buffer.AddData(tradeData); err != nil {
-						logger.Println("Error adding data to buffer: ", err)
+						logger.Println("❌ Error adding data to buffer: ", err)
 						return
 					}
 				}
 			} else {
-				logger.Printf("⚠️ No buffer found for ID: %s", bufferCode)
+				logger.Printf("❌ No buffer found for ID: %s", bufferCode)
 			}
 		}
 	}
 }
+
+
 
 // ReceiveMessages()
 //

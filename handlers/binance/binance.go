@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+  "bytes"
 	"os/signal"
 	"strings"
 	"time"
@@ -111,7 +112,7 @@ func InitializeStreams(conn *websocket.Conn, exchange utils.ExchangeConfig, data
 //	goroutine that subscribes and launches 2 goroutines to listen for messages and handle them
 func HandleConnection(conn *websocket.Conn, exchange utils.ExchangeConfig, logger *log.Logger) {
 	if conn == nil {
-		logger.Println("Connection is nil, exiting HandleConnection.")
+		logger.Println("❌ Connection is nil, exiting HandleConnection.")
 		return
 	}
 
@@ -154,7 +155,12 @@ func HandleConnection(conn *websocket.Conn, exchange utils.ExchangeConfig, logge
 //
 //	basically routes the data to the correct processing function
 func ProcessMessage(message []byte, tickerDataP *[]utils.TickerDataStruct, tradeData *[]utils.TradeDataStruct) (int, error) {
-	var pMessage GlobalMessageStruct
+	if bytes.Equal(message, []byte(`{"result":null,"id":5}`)){
+    return 5, nil
+  }
+
+
+  var pMessage GlobalMessageStruct
 	wrapped, err := WrappedCheck(message)
 	if err != nil {
 		return 0, err
@@ -169,8 +175,10 @@ func ProcessMessage(message []byte, tickerDataP *[]utils.TickerDataStruct, trade
 		return 0, err
 	}
 
-	switch extractEventType(pMessage) {
-	case "24hrTicker":
+
+
+	switch {
+	case extractEventType(pMessage) == "24hrTicker":
 		var tickerMsg TickerData
 		if err := json.Unmarshal(bmessage, &tickerMsg); err != nil {
 			return 1, err
@@ -185,7 +193,7 @@ func ProcessMessage(message []byte, tickerDataP *[]utils.TickerDataStruct, trade
 		}}
 		return 1, nil
 
-	case "trade":
+	case extractEventType(pMessage) == "trade":
 		var tradeMsg TradeData
 		if err := json.Unmarshal(bmessage, &tradeMsg); err != nil {
 			return 2, err
@@ -200,7 +208,7 @@ func ProcessMessage(message []byte, tickerDataP *[]utils.TickerDataStruct, trade
 		return 2, nil
 
 	default:
-		return 0, errors.New("unknown message type:")
+    return 0, fmt.Errorf("unknown message type: %s", message)	
 	}
 }
 
@@ -237,7 +245,7 @@ func ConsumeMessages(messageQueue chan []byte, exchange utils.ExchangeConfig, do
 
 		switch dataType {
 		case 0:
-			logger.Println("⚠️ Unknown message type, skipping message")
+			logger.Println("❌ Unknown message type, skipping message")
 			continue
 		case 1:
 			if tickerData[0].Symbol != "" {
@@ -247,23 +255,25 @@ func ConsumeMessages(messageQueue chan []byte, exchange utils.ExchangeConfig, do
 			if tradeData[0].Symbol != "" {
 				bufferCode = fmt.Sprintf("%s:trade@%s", tradeData[0].Symbol, normalizedExchangeName)
 			}
+    case 5:
+      logger.Println("✅ Subscribe Success")
 		}
 
 		if bufferCode != "" {
 			if buffer, exists := buffers[bufferCode]; exists {
 				if dataType == 1 {
 					if err := buffer.AddData(tickerData); err != nil {
-						logger.Println("Error adding data to buffer: ", err)
+						logger.Println("❌ Error adding data to buffer: ", err)
 						return
 					}
 				} else {
 					if err := buffer.AddData(tradeData); err != nil {
-						logger.Println("Error adding data to buffer: ", err)
+						logger.Println("❌ Error adding data to buffer: ", err)
 						return
 					}
 				}
 			} else {
-				logger.Printf("⚠️ No buffer found for ID: %s", bufferCode)
+				logger.Printf("❌ No buffer found for ID: %s", bufferCode)
 			}
 		}
 	}
@@ -291,7 +301,7 @@ func ReceiveMessages(conn *websocket.Conn, messageQueue chan []byte, done chan s
 	for {
 		_, message, err := conn.ReadMessage()
 		if err != nil {
-			logger.Printf("Error reading message from %s: %v", exchange.Name, err)
+			logger.Printf("❌ Error reading message from %s: %v", exchange.Name, err)
 			return
 		}
 
@@ -301,7 +311,7 @@ func ReceiveMessages(conn *websocket.Conn, messageQueue chan []byte, done chan s
 		case <-time.After(time.Millisecond * 100):
 			logger.Println("Producer slowed down")
 		default:
-			logger.Printf("⚠️ Message queue full, dropping message for %s", exchange.Name)
+			logger.Printf("❌ Message queue full, dropping message for %s", exchange.Name)
 		}
 	}
 }
@@ -323,13 +333,13 @@ func ReceiveMessages(conn *websocket.Conn, messageQueue chan []byte, done chan s
 func CloseConnection(conn *websocket.Conn, exchangeName string, logger *log.Logger) {
 	closeMsg := websocket.FormatCloseMessage(websocket.CloseNormalClosure, "Normal closure")
 	if err := conn.WriteMessage(websocket.CloseMessage, closeMsg); err != nil {
-		logger.Printf("Error sending close message for %s: %v", exchangeName, err)
+		logger.Printf("❌ Error sending close message for %s: %v", exchangeName, err)
 	}
 
 	time.Sleep(time.Second)
 
 	if err := conn.Close(); err != nil {
-		logger.Printf("Error closing connection for %s: %v", exchangeName, err)
+		logger.Printf("❌ Error closing connection for %s: %v", exchangeName, err)
 	} else {
 		logger.Printf("Connection for %s closed gracefully", exchangeName)
 	}
