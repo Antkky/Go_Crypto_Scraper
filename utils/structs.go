@@ -36,16 +36,3 @@ type TradeDataStruct struct {
 	Quantity  string
 	Bid_MM    bool
 }
-
-// Buffer Structs
-type DataBuffer struct {
-	TickerBuffer []TickerDataStruct
-	TradeBuffer  []TradeDataStruct
-	MaxSize      int
-	DataType     string
-	Symbol       string
-	Market       string
-	ID           string
-	FilePath     string
-	FileName     string
-}

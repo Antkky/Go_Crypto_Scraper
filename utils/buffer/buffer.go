@@ -1,4 +1,4 @@
-package utils
+package buffer
 
 import (
 	"encoding/csv"
@@ -7,6 +7,8 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+
+	"github.com/Antkky/go_crypto_scraper/utils"
 )
 
 // validateFilePath checks if the directory exists and creates it if it does not
@@ -47,7 +49,7 @@ func getCSVHeader(dataType string) ([]string, error) {
 // writeDataToCSV writes a batch of data to the CSV file
 func writeDataToCSV(writer *csv.Writer, buffer interface{}) error {
 	switch batch := buffer.(type) {
-	case []TickerDataStruct:
+	case []utils.TickerDataStruct:
 		for _, record := range batch {
 			fData, err := FormatData(record)
 			if err != nil {
@@ -57,7 +59,7 @@ func writeDataToCSV(writer *csv.Writer, buffer interface{}) error {
 				return fmt.Errorf("error writing ticker record: %w", err)
 			}
 		}
-	case []TradeDataStruct:
+	case []utils.TradeDataStruct:
 		for _, record := range batch {
 			fData, err := FormatData(record)
 			if err != nil {
@@ -76,7 +78,7 @@ func writeDataToCSV(writer *csv.Writer, buffer interface{}) error {
 // FormatData formats the data for writing to CSV
 func FormatData(record interface{}) ([]string, error) {
 	switch v := record.(type) {
-	case TickerDataStruct:
+	case utils.TickerDataStruct:
 		if v.BidPrice == "" || v.AskPrice == "" || v.BidSize == "" || v.AskSize == "" {
 			return nil, fmt.Errorf("missing required field(s) in TickerDataStruct")
 		}
@@ -91,7 +93,7 @@ func FormatData(record interface{}) ([]string, error) {
 			v.AskSize,
 		}, nil
 
-	case TradeDataStruct:
+	case utils.TradeDataStruct:
 		// Check for empty fields that should contain data
 		if v.Price == "" || v.Quantity == "" {
 			return nil, nil
@@ -115,12 +117,12 @@ func FormatData(record interface{}) ([]string, error) {
 // Methods to add data to the buffer
 func (c *DataBuffer) AddData(record interface{}) error {
 	switch v := record.(type) {
-	case TickerDataStruct:
+	case utils.TickerDataStruct:
 		c.TickerBuffer = append(c.TickerBuffer, v)
 		if len(c.TickerBuffer) >= c.MaxSize {
 			return c.FlushData()
 		}
-	case TradeDataStruct:
+	case utils.TradeDataStruct:
 		c.TradeBuffer = append(c.TradeBuffer, v)
 		if len(c.TradeBuffer) >= c.MaxSize {
 			return c.FlushData()
@@ -176,8 +178,8 @@ func (c *DataBuffer) FlushData() error {
 // Create a new buffer
 func NewDataBuffer(dataType string, market string, id string, maxSize int, fileName string, filePath string) *DataBuffer {
 	return &DataBuffer{
-		TickerBuffer: make([]TickerDataStruct, maxSize),
-		TradeBuffer:  make([]TradeDataStruct, maxSize),
+		TickerBuffer: make([]utils.TickerDataStruct, 0),
+		TradeBuffer:  make([]utils.TradeDataStruct, 0),
 		DataType:     dataType,
 		Market:       market,
 		ID:           id,
